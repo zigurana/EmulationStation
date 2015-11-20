@@ -72,10 +72,6 @@ void Settings::setDefaults()
 	mStringMap["ThemeSet"] = "";
 	mStringMap["ScreenSaverBehavior"] = "dim";
 	mStringMap["Scraper"] = "TheGamesDB";
-	mStringMap["UIMode"] = "Full";
-		
-	//mStringMap["UIMode_passkey"] = "↑↑↓↓←→←→ba";
-	mStringMap["UIMode_passkey"] = "uuddlrlrba";
 }
 
 template <typename K, typename V>

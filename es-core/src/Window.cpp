@@ -14,7 +14,6 @@ Window::Window() : mNormalizeNextUpdate(false), mFrameTimeElapsed(0), mFrameCoun
 	mHelp = new HelpComponent(this);
 	mBackgroundOverlay = new ImageComponent(this);
 	mBackgroundOverlay->setImage(":/scroll_gradient.png");
-	mPasskeyCounter = 0;
 }
 
 Window::~Window()
@@ -128,8 +127,6 @@ void Window::input(InputConfig* config, Input input)
 		if(peekGui())
 			this->peekGui()->input(config, input);
 	}
-	
-	ListenForPassKeySequence(config, input);
 }
 
 void Window::update(int deltaTime)
@@ -336,58 +333,4 @@ void Window::onSleep()
 void Window::onWake()
 {
 
-}
-
-// This function reads the current input to listen for the passkey
-// sequence to unlock the UI mode.
-// the progress is saved in mPasskeyCounter
-// supported inputs: 
-// ↑ = u, ↓ = d, ← = l, → = r, A, B, X, Y		  
-// default passkeyseq = "↑↑↓↓←→←→ba";
-void Window::ListenForPassKeySequence(InputConfig* config, Input input)
-{
-	LOG(LogDebug) << "Window::ListenForPassKeySequence(), mPasskeyCounter ="<< mPasskeyCounter;
-	std::string passkeyseq = Settings::getInstance()->getString("UIMode_passkey");
-	
-	if(!input.value){
-		return; // its an event, but prob the keyup/release: change nothing
-	}
-		
-	
-	if(config->isMappedTo("down", input) && (passkeyseq[ mPasskeyCounter ] == 'd'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("up", input) && (passkeyseq[mPasskeyCounter] == 'u'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("left", input) && (passkeyseq[mPasskeyCounter] == 'l'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("right", input) && (passkeyseq[mPasskeyCounter] == 'r'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("a", input) && (passkeyseq[mPasskeyCounter] == 'a'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("b", input) && (passkeyseq[mPasskeyCounter] == 'b'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("x", input) && (passkeyseq[mPasskeyCounter] == 'x'))
-	{
-		++mPasskeyCounter;
-	}else if(config->isMappedTo("y", input) && (passkeyseq[mPasskeyCounter] == 'y'))
-	{
-		++mPasskeyCounter;
-	}else
-	{
-		mPasskeyCounter = 0; // current input is incorrect, reset counter
-	}
-		
-	if (mPasskeyCounter >= (passkeyseq.length()-1))
-	{
-		// When we have reached the end of the list, trigger UI_mode unlock
-		LOG(LogDebug) << "Window::ListenForPassKeySequence(), we've reached the end, switching UIMode to full!";
-		Settings::getInstance()->setString("UIMode", "Full");
-		mPasskeyCounter = 0;
-	}
 }
