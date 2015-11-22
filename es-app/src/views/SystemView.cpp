@@ -173,28 +173,52 @@ void SystemView::onCursorChanged(const CursorState& state)
 
 	unsigned int gameCount = getSelected()->getGameCount();
 	unsigned int favoritesCount = getSelected()->getFavoritesCount();
+	unsigned int kidgamesCount = getSelected()->getKidGamesCount();
 
 	// also change the text after we've fully faded out
-	setAnimation(infoFadeOut, 0, [this, gameCount, favoritesCount] {
+	setAnimation(infoFadeOut, 0, [this, gameCount, favoritesCount, kidgamesCount] {
 		std::stringstream ss;
 
-		// only display a game count if there are at least 2 games
-		if (gameCount == 1)
+		// only display a game count if there are at least 2 games - Full / Kiosk UI modes
+		if( (Settings::getInstance()->getString("UIMode") == "Full") ||
+			(Settings::getInstance()->getString("UIMode") == "Kiosk"))
 		{
-			ss << gameCount << " GAME AVAILABLE";
-		}
-		else if (gameCount > 1)
-		{
-			ss << gameCount << " GAMES AVAILABLE";
-		}
+			if (gameCount == 1)
+			{
+				ss << gameCount << " GAME AVAILABLE";
+			}
+			else if (gameCount > 1)
+			{
+				ss << gameCount << " GAMES AVAILABLE";
+			}
 
-		if (favoritesCount == 1)
-		{
-			ss << ", " << favoritesCount << " FAVORITE";
+			if (favoritesCount == 1)
+			{
+				ss << ", " << favoritesCount << " FAVORITE";
+			}
+			else if (favoritesCount > 1)
+			{
+				ss << ", " << favoritesCount << " FAVORITES";
+			}
+			if (kidgamesCount == 1)
+			{
+				ss << ", " << kidgamesCount << " KID-FRIENDLY GAME";
+			}
+			else if (kidgamesCount > 1)
+			{
+				ss << ", " << kidgamesCount << " KID-FRIENDLY GAMES";
+			}
 		}
-		else if (favoritesCount > 1)
+		if(Settings::getInstance()->getString("UIMode") == "Kid")
 		{
-			ss << ", " << favoritesCount << " FAVORITES";
+			if (kidgamesCount == 1)
+			{
+				ss << kidgamesCount << " KID-FRIENDLY GAME AVAILABLE";
+			}
+			else if (kidgamesCount > 1)
+			{
+				ss << ", " << kidgamesCount << " KID-FRIENDLY GAMES AVAILABLE";
+			}
 		}
 
 		mSystemInfo.setText(ss.str());

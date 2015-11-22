@@ -42,7 +42,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 	mHeaderText.setText(files.at(0)->getSystem()->getFullName());
 
 	bool hasFavorites = false;
-
+	bool hasKidGames = false;
 	if (Settings::getInstance()->getBool("FavoritesOnly"))
 	{
 		for (auto it = files.begin(); it != files.end(); it++)
@@ -52,6 +52,19 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 				if ((*it)->metadata.get("favorite").compare("yes") == 0)
 				{
 					hasFavorites = true;
+					break;
+				}
+			}
+		}
+	}else if (Settings::getInstance()->getString("UImode") == "Kid")
+	{
+		for (auto it = files.begin(); it != files.end(); it++)
+		{
+			if ((*it)->getType() == GAME)
+			{
+				if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+				{
+					hasKidGames = true;
 					break;
 				}
 			}
@@ -69,8 +82,16 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
 				}
 			}
-		}
-		else
+		}else if ((Settings::getInstance()->getString("UImode") == "Kid") && hasKidGames)
+		{
+			if ((*it)->getType() == GAME)
+			{
+				if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+				{
+					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+				}
+			}
+		}else
 		{
 			mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
 		}

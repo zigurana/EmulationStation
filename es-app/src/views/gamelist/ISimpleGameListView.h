@@ -41,4 +41,5 @@ protected:
 	
 private:
    bool mFavoriteChange;
+   bool mKidGameChange;
 };

@@ -47,18 +47,26 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	}
 
 	mMenu.addWithLabel("SORT GAMES BY", mListSort);
-
-	auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
-	favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
-	mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
-	addSaveFunc([favorite_only] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); });
-
-	// edit game metadata
-	row.elements.clear();
-	row.addElement(std::make_shared<TextComponent>(mWindow, "EDIT THIS GAME'S METADATA", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
-	row.addElement(makeArrow(mWindow), false);
-	row.makeAcceptInputHandler(std::bind(&GuiGamelistOptions::openMetaDataEd, this));
-	mMenu.addRow(row);
+	
+	// Show favorites only menu option - only for UI mode is Full or Kiosk
+	if( (Settings::getInstance()->getString("UIMode") == "Full") ||
+			(Settings::getInstance()->getString("UIMode") == "Kiosk"))
+	{
+		auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
+		favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
+		mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
+		addSaveFunc([favorite_only] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); });
+	}
+	
+	// edit game metadata - only in Full UI mode
+	if(Settings::getInstance()->getString("UIMode") == "Full")
+	{
+		row.elements.clear();
+		row.addElement(std::make_shared<TextComponent>(mWindow, "EDIT THIS GAME'S METADATA", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
+		row.addElement(makeArrow(mWindow), false);
+		row.makeAcceptInputHandler(std::bind(&GuiGamelistOptions::openMetaDataEd, this));
+		mMenu.addRow(row);
+	}
 
 	// center the menu
 	setSize((float)Renderer::getScreenWidth(), (float)Renderer::getScreenHeight());

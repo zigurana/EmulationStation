@@ -28,7 +28,7 @@ private:
 
 	ImageComponent mImage;
 
-	TextComponent mLblRating, mLblReleaseDate, mLblDeveloper, mLblPublisher, mLblGenre, mLblPlayers, mLblLastPlayed, mLblPlayCount, mLblFavorite;
+	TextComponent mLblRating, mLblReleaseDate, mLblDeveloper, mLblPublisher, mLblGenre, mLblPlayers, mLblLastPlayed, mLblPlayCount, mLblFavorite, mLblKidGame;
 
 	RatingComponent mRating;
 	DateTimeComponent mReleaseDate;
@@ -39,7 +39,8 @@ private:
 	DateTimeComponent mLastPlayed;
 	TextComponent mPlayCount;
 	TextComponent mFavorite;
-
+	TextComponent mKidGame;
+	
 	std::vector<TextComponent*> getMDLabels();
 	std::vector<GuiComponent*> getMDValues();
 

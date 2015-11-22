@@ -31,6 +31,7 @@ ViewController::ViewController(Window* window)
 {
 	mState.viewing = NOTHING;
 	mFavoritesOnly = Settings::getInstance()->getBool("FavoritesOnly");
+	mKidGamesOnly = Settings::getInstance()->getString("UIMode") == "Kid";
 }
 
 ViewController::~ViewController()
@@ -100,10 +101,14 @@ void ViewController::goToGameList(SystemData* system)
 	if (mInvalidGameList[system] == true)
 	{
 		updateFavorite(system, getGameListView(system).get()->getCursor());
-		if (mFavoritesOnly != Settings::getInstance()->getBool("FavoritesOnly"))
+		updateKidGame(system, getGameListView(system).get()->getCursor());
+		
+		if ((mFavoritesOnly != Settings::getInstance()->getBool("FavoritesOnly")) ||
+			(mKidGamesOnly != (Settings::getInstance()->getString("UIMode") == "Kid")))
 		{
 			reloadGameListView(system);
 			mFavoritesOnly = Settings::getInstance()->getBool("FavoritesOnly");
+			mKidGamesOnly = Settings::getInstance()->getString("UIMode") == "Kid";
 		}
 		mInvalidGameList[system] = false;
 	}
@@ -144,6 +149,51 @@ void ViewController::updateFavorite(SystemData* system, FileData* file)
 				if ((*it)->getType() == GAME)
 				{
 					if ((*it)->metadata.get("favorite").compare("yes") == 0)
+					{
+						view->setCursor(*it);
+						break;
+					}
+				}
+			}
+		}
+
+		if (!found)
+		{
+			view->setCursor(*(files.begin() + pos));
+		}
+	}
+
+	view->updateInfoPanel();
+}
+void ViewController::updateKidGame(SystemData* system, FileData* file)
+{
+	IGameListView* view = getGameListView(system).get();
+	if (Settings::getInstance()->getString("UIMode") == "Kid")
+	{
+		const std::vector<FileData*>& files = system->getRootFolder()->getChildren();
+		view->populateList(files);
+		int pos = std::find(files.begin(), files.end(), file) - files.begin();
+		bool found = false;
+		for (auto it = files.begin() + pos; it != files.end(); it++)
+		{
+			if ((*it)->getType() == GAME)
+			{
+				if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+				{
+					view->setCursor(*it);
+					found = true;
+					break;
+				}
+			}
+		}
+
+		if (!found)
+		{
+			for (auto it = files.begin() + pos; it != files.begin(); it--)
+			{
+				if ((*it)->getType() == GAME)
+				{
+					if ((*it)->metadata.get("kidgame").compare("yes") == 0)
 					{
 						view->setCursor(*it);
 						break;

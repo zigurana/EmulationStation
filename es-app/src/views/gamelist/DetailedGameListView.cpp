@@ -10,10 +10,10 @@ DetailedGameListView::DetailedGameListView(Window* window, FileData* root, Syste
 	mImage(window), mSystem(system), 
 
 	mLblRating(window), mLblReleaseDate(window), mLblDeveloper(window), mLblPublisher(window), 
-	mLblGenre(window), mLblPlayers(window), mLblLastPlayed(window), mLblPlayCount(window), mLblFavorite(window),
+	mLblGenre(window), mLblPlayers(window), mLblLastPlayed(window), mLblPlayCount(window), mLblFavorite(window), mLblKidGame(window),
 
 	mRating(window), mReleaseDate(window), mDeveloper(window), mPublisher(window), 
-	mGenre(window), mPlayers(window), mLastPlayed(window), mPlayCount(window), mFavorite(window)
+	mGenre(window), mPlayers(window), mLastPlayed(window), mPlayCount(window), mFavorite(window), mKidGame(window)
 {
 	//mHeaderImage.setPosition(mSize.x() * 0.25f, 0);
 
@@ -62,6 +62,12 @@ DetailedGameListView::DetailedGameListView(Window* window, FileData* root, Syste
 		addChild(&mLblFavorite);
 		addChild(&mFavorite);
 	}
+	if (system->getHasKidGames())
+	{
+		mLblKidGame.setText("Kid-friendly game: ");
+		addChild(&mLblKidGame);
+		addChild(&mKidGame);
+	}
 
 	mDescContainer.setPosition(mSize.x() * padding, mSize.y() * 0.65f);
 	mDescContainer.setSize(mSize.x() * (0.50f - 2*padding), mSize.y() - mDescContainer.getPosition().y());
@@ -88,12 +94,12 @@ void DetailedGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& them
 	initMDLabels();
 	std::vector<TextComponent*> labels = getMDLabels();
 
-	if (mSystem->getHasFavorites())
+	if (mSystem->getHasFavorites() && mSystem->getHasKidGames())
 	{
-		assert(labels.size() == 9);
-		const char* lblElements[9] = {
+		assert(labels.size() == 10);
+		const char* lblElements[10] = {
 			"md_lbl_rating", "md_lbl_releasedate", "md_lbl_developer", "md_lbl_publisher",
-			"md_lbl_genre", "md_lbl_players", "md_lbl_lastplayed", "md_lbl_playcount", "md_lbl_favorite"
+			"md_lbl_genre", "md_lbl_players", "md_lbl_lastplayed", "md_lbl_playcount", "md_lbl_favorite", "md_lbl_kidgame"
 		};
 
 		for (unsigned int i = 0; i < labels.size(); i++)
@@ -118,12 +124,12 @@ void DetailedGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& them
 	initMDValues();
 	std::vector<GuiComponent*> values = getMDValues();
 
-	if (mSystem->getHasFavorites())
+	if (mSystem->getHasFavorites() && mSystem->getHasKidGames())
 	{
-		assert(values.size() == 9);
-		const char* valElements[9] = {
+		assert(values.size() == 10);
+		const char* valElements[10] = {
 			"md_rating", "md_releasedate", "md_developer", "md_publisher",
-			"md_genre", "md_players", "md_lastplayed", "md_playcount", "md_favorite"
+			"md_genre", "md_players", "md_lastplayed", "md_playcount", "md_favorite", "md_kidgame"
 		};
 
 		for (unsigned int i = 0; i < values.size(); i++)
@@ -199,6 +205,7 @@ void DetailedGameListView::initMDValues()
 	mLastPlayed.setFont(defaultFont);
 	mPlayCount.setFont(defaultFont);
 	mFavorite.setFont(defaultFont);
+	mKidGame.setFont(defaultFont);
 
 	float bottom = 0.0f;
 
@@ -244,6 +251,7 @@ void DetailedGameListView::updateInfoPanel()
 			mLastPlayed.setValue(file->metadata.get("lastplayed"));
 			mPlayCount.setValue(file->metadata.get("playcount"));
 			mFavorite.setValue(file->metadata.get("favorite"));
+			mKidGame.setValue(file->metadata.get("kidgame"));
 		}
 		
 		fadingOut = false;
@@ -298,6 +306,10 @@ std::vector<TextComponent*> DetailedGameListView::getMDLabels()
 	{
 		ret.push_back(&mLblFavorite);
 	}
+	if (mSystem->getHasKidGames())
+	{
+		ret.push_back(&mLblKidGame);
+	}
 	return ret;
 }
 
@@ -316,6 +328,10 @@ std::vector<GuiComponent*> DetailedGameListView::getMDValues()
 	{
 		ret.push_back(&mFavorite);
 	}
+	if (mSystem->getHasKidGames())
+	{
+		ret.push_back(&mKidGame);
+	}
 	return ret;
 }
 
@@ -333,6 +349,10 @@ std::vector<HelpPrompt> DetailedGameListView::getHelpPrompts()
 	if (mSystem->getHasFavorites())
 	{
 		prompts.push_back(HelpPrompt("x", "toggle favorite"));
+	}
+	if (mSystem->getHasKidGames())
+	{
+		prompts.push_back(HelpPrompt("y", "toggle Kid-friendly"));
 	}
 	prompts.push_back(HelpPrompt("select", "options"));
 	return prompts;

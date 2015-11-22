@@ -47,8 +47,13 @@ void GridGameListView::populateList(const std::vector<FileData*>& files)
 			{
 				mGrid.add((*it)->getName(), (*it)->getThumbnailPath(), *it);
 			}
-		}
-		else
+		}else if(Settings::getInstance()->getString("UIMode") == "Kid")
+		{
+			if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+			{
+				mGrid.add((*it)->getName(), (*it)->getThumbnailPath(), *it);
+			}
+		}else
 		{
 			mGrid.add((*it)->getName(), (*it)->getThumbnailPath(), *it);
 		}

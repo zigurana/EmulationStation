@@ -36,6 +36,7 @@ public:
 	void onFileChanged(FileData* file, FileChangeType change);
 
 	void updateFavorite(SystemData* system, FileData* file);
+	void updateKidGame(SystemData* system, FileData* file);
 
 	// Plays a nice launch effect and launches the game at the end of it.
 	// Once the game terminates, plays a return effect.
@@ -89,6 +90,7 @@ private:
 	float mFadeOpacity;
 	bool mLockInput;
 	bool mFavoritesOnly;
+	bool mKidGamesOnly;
 
 	State mState;
 };

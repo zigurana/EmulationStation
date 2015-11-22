@@ -8,7 +8,7 @@
 #include "Gamelist.h"
 
 ISimpleGameListView::ISimpleGameListView(Window* window, FileData* root) : IGameListView(window, root),
-mHeaderText(window), mHeaderImage(window), mBackground(window), mThemeExtras(window), mFavoriteChange(false)
+mHeaderText(window), mHeaderImage(window), mBackground(window), mThemeExtras(window), mFavoriteChange(false), mKidGameChange(false)
 {
 	mHeaderText.setText("Logo Text");
 	mHeaderText.setSize(mSize.x(), 0);
@@ -90,7 +90,11 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mFavoriteChange = false;
 				}
-
+				if (mKidGameChange)
+				{
+					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
+					mKidGameChange = false;
+				}
 				ViewController::get()->goToSystemView(getCursor()->getSystem());
 			}
 
@@ -116,6 +120,27 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					updateInfoPanel();
 				}
 			}
+		}else if (config->isMappedTo("y", input))
+		{
+			FileData* cursor = getCursor();
+			if (cursor->getSystem()->getHasKidGames())
+			{
+				if (cursor->getType() == GAME)
+				{
+					mKidGameChange = true;
+					MetaDataList* md = &cursor->metadata;
+					std::string value = md->get("kidgame");
+					if (value.compare("no") == 0)
+					{
+						md->set("kidgame", "yes");
+					}
+					else
+					{
+						md->set("kidgame", "no");
+					}
+					updateInfoPanel();
+				}
+			}
 		}else if(config->isMappedTo("right", input))
 		{
 			if(Settings::getInstance()->getBool("QuickSystemSelect"))
@@ -125,6 +150,11 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 				{
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mFavoriteChange = false;
+				}
+				if (mKidGameChange)
+				{
+					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
+					mKidGameChange = false;
 				}
 				ViewController::get()->goToNextGameList();
 				return true;
@@ -138,6 +168,11 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 				{
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mFavoriteChange = false;
+				}
+				if (mKidGameChange)
+				{
+					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
+					mKidGameChange = false;
 				}
 				ViewController::get()->goToPrevGameList();
 				return true;

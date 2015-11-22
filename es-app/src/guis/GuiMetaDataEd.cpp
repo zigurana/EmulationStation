@@ -95,6 +95,14 @@ GuiMetaDataEd::GuiMetaDataEd(Window* window, MetaDataList* md, const std::vector
 				row.addElement(ed, false);
 				break;
 			}
+		case MD_BOOL:
+			{
+				ed = std::make_shared<SwitchComponent>(mWindow);
+				row.addElement(ed, false);
+				
+				break;
+			}
+				
 		case MD_MULTILINE_STRING:
 		default:
 			{

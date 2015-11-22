@@ -21,7 +21,9 @@ public:
 	inline const std::string& getStartPath() const { return mStartPath; }
 	inline const std::vector<std::string>& getExtensions() const { return mSearchExtensions; }
 	inline const std::string& getThemeFolder() const { return mThemeFolder; }
-	inline bool getHasFavorites() const { return mHasFavorites; }
+	inline bool getHasFavorites() const { return mHasFavorites; }	
+	inline bool getHasKidGames() const { return mHasKidGames; }
+
 
 	inline const std::vector<PlatformIds::PlatformId>& getPlatformIds() const { return mPlatformIds; }
 	inline bool hasPlatformId(PlatformIds::PlatformId id) { return std::find(mPlatformIds.begin(), mPlatformIds.end(), id) != mPlatformIds.end(); }
@@ -34,6 +36,7 @@ public:
 	
 	unsigned int getGameCount() const;
 	unsigned int getFavoritesCount() const;
+	unsigned int getKidGamesCount() const;
 
 	void launchGame(Window* window, FileData* game);
 
@@ -77,6 +80,7 @@ private:
 	std::shared_ptr<ThemeData> mTheme;
 
 	bool mHasFavorites;
+	bool mHasKidGames;
 
 	void populateFolder(FileData* folder);
 
