@@ -37,6 +37,7 @@ public:
 	unsigned int getGameCount() const;
 	unsigned int getFavoritesCount() const;
 	unsigned int getKidGamesCount() const;
+	unsigned int getHiddenCount() const;
 
 	void launchGame(Window* window, FileData* game);
 

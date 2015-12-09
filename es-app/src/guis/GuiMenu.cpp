@@ -94,21 +94,21 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 
 	addEntry("UI SETTINGS", 0x777777FF, true,
 		[this] {
-			auto s = new GuiSettings(mWindow, "UI SETTINGS");
-			// UI mode
-			auto UImodeSelection = std::make_shared< OptionListComponent<std::string> >(mWindow, "UI MODE", false);
-			std::vector<std::string> UImodes;
-			UImodes.push_back("Full");
-			UImodes.push_back("Kiosk");
-			UImodes.push_back("Kid");
-			for(auto it = UImodes.begin(); it != UImodes.end(); it++)
-				UImodeSelection->add(*it, *it, Settings::getInstance()->getString("UIMode") == *it);
-			s->addWithLabel("UI MODE", UImodeSelection);
-			s->addSaveFunc([UImodeSelection] { Settings::getInstance()->setString("UIMode", UImodeSelection->getSelected()); });
-			
 			// Wrap all the rest of the settings in the UI mode conditional:
 			if(Settings::getInstance()->getString("UIMode") == "Full")
 			{
+				auto s = new GuiSettings(mWindow, "UI SETTINGS");
+				// UI mode
+				auto UImodeSelection = std::make_shared< OptionListComponent<std::string> >(mWindow, "UI MODE", false);
+				std::vector<std::string> UImodes;
+				UImodes.push_back("Full");
+				UImodes.push_back("Kiosk");
+				UImodes.push_back("Kid");
+				for(auto it = UImodes.begin(); it != UImodes.end(); it++)
+					UImodeSelection->add(*it, *it, Settings::getInstance()->getString("UIMode") == *it);
+				s->addWithLabel("UI MODE", UImodeSelection);
+				s->addSaveFunc([UImodeSelection] { Settings::getInstance()->setString("UIMode", UImodeSelection->getSelected()); });
+
 				// screensaver time
 				auto screensaver_time = std::make_shared<SliderComponent>(mWindow, 0.f, 30.f, 1.f, "m");
 				screensaver_time->setValue((float)(Settings::getInstance()->getInt("ScreenSaverTime") / (1000 * 60)));
@@ -180,8 +180,8 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 							ViewController::get()->reloadAll(); // TODO - replace this with some sort of signal-based implementation
 					});
 				}
+				mWindow->pushGui(s);
 			}
-			mWindow->pushGui(s);
 	});
 
 	if(Settings::getInstance()->getString("UIMode") == "Full")

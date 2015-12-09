@@ -43,13 +43,13 @@ void GridGameListView::populateList(const std::vector<FileData*>& files)
 	{
 		if (Settings::getInstance()->getBool("FavoritesOnly"))
 		{
-			if ((*it)->metadata.get("favorite").compare("yes") == 0)
+			if ((*it)->metadata.get("favorite").compare("true") == 0)
 			{
 				mGrid.add((*it)->getName(), (*it)->getThumbnailPath(), *it);
 			}
 		}else if(Settings::getInstance()->getString("UIMode") == "Kid")
 		{
-			if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+			if ((*it)->metadata.get("kidgame").compare("true") == 0)
 			{
 				mGrid.add((*it)->getName(), (*it)->getThumbnailPath(), *it);
 			}

@@ -5,6 +5,8 @@
 #include "ThemeData.h"
 #include "SystemData.h"
 #include "Settings.h"
+#include "Log.h"
+
 
 BasicGameListView::BasicGameListView(Window* window, FileData* root)
 	: ISimpleGameListView(window, root), mList(window)
@@ -45,26 +47,33 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 	bool hasKidGames = false;
 	if (Settings::getInstance()->getBool("FavoritesOnly"))
 	{
+		LOG(LogDebug)<< "trying to find fav games";
 		for (auto it = files.begin(); it != files.end(); it++)
 		{
 			if ((*it)->getType() == GAME)
 			{
-				if ((*it)->metadata.get("favorite").compare("yes") == 0)
+				if ((*it)->metadata.get("favorite").compare("true") == 0)
 				{
 					hasFavorites = true;
+					LOG(LogDebug)<< "at least 1 fav game found!";
+
 					break;
 				}
 			}
 		}
 	}else if (Settings::getInstance()->getString("UImode") == "Kid")
 	{
+		LOG(LogDebug)<< "trying to find kid games";
+
 		for (auto it = files.begin(); it != files.end(); it++)
 		{
 			if ((*it)->getType() == GAME)
 			{
-				if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+				if ((*it)->metadata.get("kidgame").compare("true") == 0)
 				{
 					hasKidGames = true;
+					LOG(LogDebug)<< "at least 1 kid game found!";
+
 					break;
 				}
 			}
@@ -77,7 +86,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 		{
 			if ((*it)->getType() == GAME)
 			{
-				if ((*it)->metadata.get("favorite").compare("yes") == 0)
+				if ((*it)->metadata.get("favorite").compare("true") == 0)
 				{
 					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
 				}
@@ -86,14 +95,15 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 		{
 			if ((*it)->getType() == GAME)
 			{
-				if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+				if ((*it)->metadata.get("kidgame").compare("true") == 0)
 				{
 					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
 				}
 			}
 		}else
 		{
-			mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+			//mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+			LOG(LogDebug)<< "no suitable games found, returning no games";
 		}
 	}
 }

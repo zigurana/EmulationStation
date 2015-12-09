@@ -17,13 +17,11 @@ MetaDataDecl gameDecls[] = {
 	{"publisher",	MD_STRING,				"unknown",			false,		"publisher",			"enter game publisher"},
 	{"genre",		MD_STRING,				"unknown",			false,		"genre",				"enter game genre"},
 	{"players",		MD_INT,					"1",				false,		"players",				"enter number of players"},
+	{"favorite",	MD_BOOL,				"false",			false,		"favorite",				"enter favorite off/on"},
+	{"kidgame",		MD_BOOL,				"false",			false,		"kidgame",				"enter kidgame off/on"},
+	{"hidden",		MD_BOOL,				"false",			false,		"hidden",				"enter hidden off/on"},
 	{"playcount",	MD_INT,					"0",				true,		"play count",			"enter number of times played"},
-	{"lastplayed",	MD_TIME,				"0", 				true,		"last played",			"enter last played date"},
-	{"favorite",	MD_STRING,				"no",				false,		"favorite",				"enter favorite yes/no"},
-	{"kidgame",		MD_STRING,				"no",				false,		"kidgame",				"enter kidgame yes/no"},
-	{"hidden",		MD_STRING,				"no",				false,		"hidden",				"enter hidden yes/no"},
-	{"test",		MD_BOOL,				"false",			false,		"bool MD test",			"toggle bool true/false"}
-	
+	{"lastplayed",	MD_TIME,				"0", 				true,		"last played",			"enter last played date"}
 };
 const std::vector<MetaDataDecl> gameMDD(gameDecls, gameDecls + sizeof(gameDecls) / sizeof(gameDecls[0]));
 
@@ -87,6 +85,7 @@ MetaDataList MetaDataList::createFromXML(MetaDataListType type, pugi::xml_node n
 
 void MetaDataList::appendToXML(pugi::xml_node parent, bool ignoreDefaults, const fs::path& relativeTo) const
 {
+	LOG(LogDebug) << "appendToXML()";
 	const std::vector<MetaDataDecl>& mdd = getMDD();
 
 	for(auto mddIter = mdd.begin(); mddIter != mdd.end(); mddIter++)

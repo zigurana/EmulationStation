@@ -61,9 +61,6 @@ DetailedGameListView::DetailedGameListView(Window* window, FileData* root, Syste
 		mLblFavorite.setText("Favorite: ");
 		addChild(&mLblFavorite);
 		addChild(&mFavorite);
-	}
-	if (system->getHasKidGames())
-	{
 		mLblKidGame.setText("Kid-friendly game: ");
 		addChild(&mLblKidGame);
 		addChild(&mKidGame);
@@ -94,7 +91,7 @@ void DetailedGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& them
 	initMDLabels();
 	std::vector<TextComponent*> labels = getMDLabels();
 
-	if (mSystem->getHasFavorites() && mSystem->getHasKidGames())
+	if (mSystem->getHasFavorites())
 	{
 		assert(labels.size() == 10);
 		const char* lblElements[10] = {
@@ -124,7 +121,7 @@ void DetailedGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& them
 	initMDValues();
 	std::vector<GuiComponent*> values = getMDValues();
 
-	if (mSystem->getHasFavorites() && mSystem->getHasKidGames())
+	if (mSystem->getHasFavorites())
 	{
 		assert(values.size() == 10);
 		const char* valElements[10] = {
@@ -346,13 +343,13 @@ std::vector<HelpPrompt> DetailedGameListView::getHelpPrompts()
 	prompts.push_back(HelpPrompt("up/down", "choose"));
 	prompts.push_back(HelpPrompt("a", "launch"));
 	prompts.push_back(HelpPrompt("b", "back"));
-	if (mSystem->getHasFavorites())
-	{
-		prompts.push_back(HelpPrompt("x", "toggle favorite"));
-	}
 	if (mSystem->getHasKidGames())
 	{
-		prompts.push_back(HelpPrompt("y", "toggle Kid-friendly"));
+		prompts.push_back(HelpPrompt("y", "Kid-game"));
+	}
+	if (mSystem->getHasFavorites())
+	{
+		prompts.push_back(HelpPrompt("x", "favorite"));
 	}
 	prompts.push_back(HelpPrompt("select", "options"));
 	return prompts;

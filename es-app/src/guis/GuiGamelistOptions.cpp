@@ -48,7 +48,7 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 
 	mMenu.addWithLabel("SORT GAMES BY", mListSort);
 	
-	// Show favorites only menu option - only for UI mode is Full or Kiosk
+	// Show favorites / kidgame only menu option - only for UI mode is Full or Kiosk
 	if( (Settings::getInstance()->getString("UIMode") == "Full") ||
 			(Settings::getInstance()->getString("UIMode") == "Kiosk"))
 	{

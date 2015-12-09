@@ -174,14 +174,23 @@ void SystemView::onCursorChanged(const CursorState& state)
 	unsigned int gameCount = getSelected()->getGameCount();
 	unsigned int favoritesCount = getSelected()->getFavoritesCount();
 	unsigned int kidgamesCount = getSelected()->getKidGamesCount();
-
+	
+	// this is a really buggy implementation to count hidden games, it assumes that
+	// none of the kid games or favorites are hidden.
+	unsigned int hiddenCount = getSelected()->getHiddenCount();
+	
 	// also change the text after we've fully faded out
-	setAnimation(infoFadeOut, 0, [this, gameCount, favoritesCount, kidgamesCount] {
+	setAnimation(infoFadeOut, 0, [this, gameCount, favoritesCount, kidgamesCount, hiddenCount] {
 		std::stringstream ss;
 
 		// only display a game count if there are at least 2 games - Full / Kiosk UI modes
-		if( (Settings::getInstance()->getString("UIMode") == "Full") ||
-			(Settings::getInstance()->getString("UIMode") == "Kiosk"))
+		LOG(LogDebug) << " UIMode = "<< Settings::getInstance()->getString("UIMode");
+		LOG(LogDebug) << gameCount << "games found";
+		LOG(LogDebug) << favoritesCount << "favorites found";
+		LOG(LogDebug) << kidgamesCount << "Kid-friendly games found";
+		LOG(LogDebug) << hiddenCount << "hidden games found";
+
+		if(Settings::getInstance()->getString("UIMode") == "Full")
 		{
 			if (gameCount == 1)
 			{
@@ -208,8 +217,36 @@ void SystemView::onCursorChanged(const CursorState& state)
 			{
 				ss << ", " << kidgamesCount << " KID-FRIENDLY GAMES";
 			}
-		}
-		if(Settings::getInstance()->getString("UIMode") == "Kid")
+		}else if(Settings::getInstance()->getString("UIMode") == "Kiosk")
+		{
+			int gameCount2 = gameCount - hiddenCount;
+			
+			if (gameCount2 == 1)
+			{
+				ss << gameCount2 << " GAME AVAILABLE";
+			}
+			else if (gameCount2 > 1)
+			{
+				ss << gameCount2 << " GAMES AVAILABLE";
+			}
+
+			if (favoritesCount == 1)
+			{
+				ss << ", " << favoritesCount << " FAVORITE";
+			}
+			else if (favoritesCount > 1)
+			{
+				ss << ", " << favoritesCount << " FAVORITES";
+			}
+			if (kidgamesCount == 1)
+			{
+				ss << ", " << kidgamesCount << " KID-FRIENDLY GAME";
+			}
+			else if (kidgamesCount > 1)
+			{
+				ss << ", " << kidgamesCount << " KID-FRIENDLY GAMES";
+			}
+		}else if(Settings::getInstance()->getString("UIMode") == "Kid")
 		{
 			if (kidgamesCount == 1)
 			{

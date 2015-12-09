@@ -1,5 +1,7 @@
 #include "FileData.h"
 #include "SystemData.h"
+#include "Log.h"
+#include "Settings.h"
 
 namespace fs = boost::filesystem;
 
@@ -104,7 +106,7 @@ std::vector<FileData*> FileData::getFavoritesRecursive(unsigned int typeMask) co
 
 	for (auto it = files.begin(); it != files.end(); it++)
 	{
-		if ((*it)->metadata.get("favorite").compare("yes") == 0)
+		if ((*it)->metadata.get("favorite").compare("true") == 0)
 		{
 			out.push_back(*it);
 		}
@@ -115,13 +117,32 @@ std::vector<FileData*> FileData::getFavoritesRecursive(unsigned int typeMask) co
 
 std::vector<FileData*> FileData::getKidGamesRecursive(unsigned int typeMask) const
 {
+	LOG(LogDebug) << "FileData::getKidGamesRecursive(typeMask = " << typeMask << ")";
 	std::vector<FileData*> out;
 	std::vector<FileData*> files = getFilesRecursive(typeMask);
 
 	for (auto it = files.begin(); it != files.end(); it++)
 	{
-		if ((*it)->metadata.get("kidgame").compare("yes") == 0)
+		if ((*it)->metadata.get("kidgame").compare("true") == 0)
 		{
+			LOG(LogDebug) << "KidGame found: " << (*it)->metadata.get("name");
+			out.push_back(*it);
+		}
+	}
+
+	return out;
+}
+std::vector<FileData*> FileData::getHiddenRecursive(unsigned int typeMask) const
+{
+	LOG(LogDebug) << "FileData::getHiddenRecursive(typeMask = " << typeMask << ")";
+	std::vector<FileData*> out;
+	std::vector<FileData*> files = getFilesRecursive(typeMask);
+
+	for (auto it = files.begin(); it != files.end(); it++)
+	{
+		if ((*it)->metadata.get("hidden").compare("true") == 0)
+		{
+			LOG(LogDebug) << "Hidden found: " << (*it)->metadata.get("name");
 			out.push_back(*it);
 		}
 	}

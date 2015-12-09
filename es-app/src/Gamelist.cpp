@@ -140,11 +140,13 @@ void parseGamelist(SystemData* system)
 
 void addFileDataNode(pugi::xml_node& parent, const FileData* file, const char* tag, SystemData* system)
 {
+	LOG(LogDebug) << "addFileDataNode(" << file->getCleanName() << ")";
 	//create game and add to parent node
 	pugi::xml_node newNode = parent.append_child(tag);
 
 	//write metadata
-	file->metadata.appendToXML(newNode, true, system->getStartPath());
+	//file->metadata.appendToXML(newNode, true, system->getStartPath());
+	file->metadata.appendToXML(newNode, false, system->getStartPath()); // set ignore defaults to false to force writing all values
 	
 	if(newNode.children().begin() == newNode.child("name") //first element is name
 		&& ++newNode.children().begin() == newNode.children().end() //theres only one element
@@ -167,7 +169,8 @@ void updateGamelist(SystemData* system)
 	//because there might be information missing in our systemdata which would then miss in the new XML.
 	//We have the complete information for every game though, so we can simply remove a game
 	//we already have in the system from the XML, and then add it back from its GameData information...
-
+	LOG(LogDebug) << "updateGamelist("<< system->getFullName() <<")";
+	
 	if(Settings::getInstance()->getBool("IgnoreGamelist"))
 		return;
 

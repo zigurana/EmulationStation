@@ -8,6 +8,7 @@
 #include "components/HelpComponent.h"
 #include "components/ImageComponent.h"
 
+
 Window::Window() : mNormalizeNextUpdate(false), mFrameTimeElapsed(0), mFrameCountElapsed(0), mAverageDeltaTime(10), 
 	mAllowSleep(true), mSleeping(false), mTimeSinceLastInput(0)
 {
@@ -346,7 +347,7 @@ void Window::onWake()
 // default passkeyseq = "↑↑↓↓←→←→ba";
 void Window::ListenForPassKeySequence(InputConfig* config, Input input)
 {
-	LOG(LogDebug) << "Window::ListenForPassKeySequence(), mPasskeyCounter ="<< mPasskeyCounter;
+	//LOG(LogDebug) << "Window::ListenForPassKeySequence(), mPasskeyCounter ="<< mPasskeyCounter;
 	std::string passkeyseq = Settings::getInstance()->getString("UIMode_passkey");
 	
 	if(!input.value){
@@ -386,8 +387,10 @@ void Window::ListenForPassKeySequence(InputConfig* config, Input input)
 	if (mPasskeyCounter >= (passkeyseq.length()-1))
 	{
 		// When we have reached the end of the list, trigger UI_mode unlock
-		LOG(LogDebug) << "Window::ListenForPassKeySequence(), we've reached the end, switching UIMode to full!";
+		LOG(LogDebug) << "Window::ListenForPassKeySequence(): Passkey sequence completed, switching UIMode to full";
 		Settings::getInstance()->setString("UIMode", "Full");
+		// TODO something to trigger screen reload, look at 
+		//ViewController::get()->reloadAll();
 		mPasskeyCounter = 0;
 	}
 }
