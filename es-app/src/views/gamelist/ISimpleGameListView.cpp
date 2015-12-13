@@ -24,6 +24,10 @@ mHeaderText(window), mHeaderImage(window), mBackground(window), mThemeExtras(win
 	addChild(&mHeaderText);
 	addChild(&mBackground);
 	addChild(&mThemeExtras);
+	mFilterHidden = ((Settings::getInstance()->getString("UIMode") == "Kiosk") ||
+						  (Settings::getInstance()->getString("UIMode") == "Kid"));
+	mFilterFav = Settings::getInstance()->getBool("FavoritesOnly");
+	mFilterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
 }
 
 void ISimpleGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
@@ -109,13 +113,13 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					mFavoriteChange = true;
 					MetaDataList* md = &cursor->metadata;
 					std::string value = md->get("favorite");
-					if (value.compare("no") == 0)
+					if (value.compare("false") == 0)
 					{
-						md->set("favorite", "yes");
+						md->set("favorite", "true");
 					}
 					else
 					{
-						md->set("favorite", "no");
+						md->set("favorite", "false");
 					}
 					updateInfoPanel();
 				}
@@ -123,20 +127,20 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 		}else if (config->isMappedTo("y", input))
 		{
 			FileData* cursor = getCursor();
-			if (cursor->getSystem()->getHasKidGames())
+			if (cursor->getSystem()->getHasKidGames() && !mFilterHidden) // only when kidgames are supported by system+theme, and when in UImode=full
 			{
 				if (cursor->getType() == GAME)
 				{
 					mKidGameChange = true;
 					MetaDataList* md = &cursor->metadata;
 					std::string value = md->get("kidgame");
-					if (value.compare("no") == 0)
+					if (value.compare("false") == 0)
 					{
-						md->set("kidgame", "yes");
+						md->set("kidgame", "true");
 					}
 					else
 					{
-						md->set("kidgame", "no");
+						md->set("kidgame", "false");
 					}
 					updateInfoPanel();
 				}
@@ -156,7 +160,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mKidGameChange = false;
 				}
-				ViewController::get()->goToNextGameList();
+				ViewController::get()->goToNextGameList(mFilterHidden, mFilterFav, mFilterKid);
 				return true;
 			}
 		}else if(config->isMappedTo("left", input))
@@ -174,7 +178,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mKidGameChange = false;
 				}
-				ViewController::get()->goToPrevGameList();
+				ViewController::get()->goToPrevGameList(mFilterHidden, mFilterFav, mFilterKid);
 				return true;
 			}
 		}

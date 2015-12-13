@@ -39,6 +39,7 @@ void BasicGameListView::onFileChanged(FileData* file, FileChangeType change)
 
 void BasicGameListView::populateList(const std::vector<FileData*>& files)
 {
+	LOG(LogDebug) << "BasicGameListView::populateList()";
 	mList.clear();
 
 	mHeaderText.setText(files.at(0)->getSystem()->getFullName());
@@ -61,7 +62,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 				}
 			}
 		}
-	}else if (Settings::getInstance()->getString("UImode") == "Kid")
+	}else if (Settings::getInstance()->getString("UIMode") == "Kid")
 	{
 		LOG(LogDebug)<< "trying to find kid games";
 
@@ -82,28 +83,61 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 
 	for(auto it = files.begin(); it != files.end(); it++)
 	{
-		if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
+		if ((*it)->getType() == GAME)
 		{
-			if ((*it)->getType() == GAME)
+			if (Settings::getInstance()->getString("UIMode") == "Full")
 			{
-				if ((*it)->metadata.get("favorite").compare("true") == 0)
+				if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
 				{
+					if((*it)->metadata.get("favorite").compare("true") == 0)
+					{
+						LOG(LogDebug) << "UImode=full, Fav only";
+						mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+					}
+				}else 
+				{
+					//LOG(LogDebug) << "UImode=full";
 					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
 				}
-			}
-		}else if ((Settings::getInstance()->getString("UImode") == "Kid") && hasKidGames)
-		{
-			if ((*it)->getType() == GAME)
+			}else if (Settings::getInstance()->getString("UIMode") == "Kiosk") // filter hidden
 			{
-				if ((*it)->metadata.get("kidgame").compare("true") == 0)
+				if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
 				{
-					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+					if(((*it)->metadata.get("favorite").compare("true") == 0) &&
+					   ((*it)->metadata.get("hidden").compare("false") == 0))
+					{
+						LOG(LogDebug) << "UImode=kiosk, Fav only & !hidden";
+						mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+					}
+				}else 
+				{
+					if((*it)->metadata.get("hidden").compare("false") == 0)
+					{
+						LOG(LogDebug) << "UImode=kiosk, !hidden";
+						mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+					}
+				}
+			}else if ((Settings::getInstance()->getString("UIMode") == "Kid") && hasKidGames) // filter all non kid-game
+			{
+				if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
+				{
+					if(((*it)->metadata.get("favorite").compare("true") == 0) &&
+					   ((*it)->metadata.get("hidden").compare("false") == 0) &&
+					   ((*it)->metadata.get("kidgame").compare("true") == 0))
+					{
+						LOG(LogDebug) << "UImode=kid, favonly, kidonly, !hidden";
+						mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+					}
+				}else 
+				{
+					if(((*it)->metadata.get("hidden").compare("false") == 0) &&
+					   ((*it)->metadata.get("kidgame").compare("true") == 0))
+					{
+						LOG(LogDebug) << "UImode=kid, favonly, kidonly, !hidden";
+						mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
+					}
 				}
 			}
-		}else
-		{
-			//mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
-			LOG(LogDebug)<< "no suitable games found, returning no games";
 		}
 	}
 }

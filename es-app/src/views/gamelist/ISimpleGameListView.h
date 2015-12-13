@@ -42,4 +42,7 @@ protected:
 private:
    bool mFavoriteChange;
    bool mKidGameChange;
+   bool mFilterHidden;
+   bool mFilterFav;
+   bool mFilterKid;
 };

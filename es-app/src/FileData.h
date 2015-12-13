@@ -44,10 +44,11 @@ public:
 	
 	virtual const std::string& getThumbnailPath() const;
 
-	std::vector<FileData*> getFilesRecursive(unsigned int typeMask) const;
-	std::vector<FileData*> getFavoritesRecursive(unsigned int typeMask) const;
+	std::vector<FileData*> getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const;
+	std::vector<FileData*> filterFileData(std::vector<FileData*> in, std::string filtername, std::string passString) const;
+	/*std::vector<FileData*> getFavoritesRecursive(unsigned int typeMask) const;
 	std::vector<FileData*> getKidGamesRecursive(unsigned int typeMask) const;
-	std::vector<FileData*> getHiddenRecursive(unsigned int typeMask) const;
+	std::vector<FileData*> getVisibleRecursive(unsigned int typeMask) const;*/
 	
 	void addChild(FileData* file); // Error if mType != FOLDER
 	void removeChild(FileData* file); //Error if mType != FOLDER

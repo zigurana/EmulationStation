@@ -34,11 +34,8 @@ public:
 	bool hasGamelist() const;
 	std::string getThemePath() const;
 	
-	unsigned int getGameCount() const;
-	unsigned int getFavoritesCount() const;
-	unsigned int getKidGamesCount() const;
-	unsigned int getHiddenCount() const;
-
+	unsigned int getGameCount(bool filterHidden, bool filterFav, bool filterKid) const;
+	
 	void launchGame(Window* window, FileData* game);
 
 	static void deleteSystems();

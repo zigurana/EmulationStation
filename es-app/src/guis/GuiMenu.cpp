@@ -69,34 +69,30 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 
 				mWindow->pushGui(s);
 		});
-	}
-	
-	addEntry("SOUND SETTINGS", 0x777777FF, true, 
-		[this] {
-			auto s = new GuiSettings(mWindow, "SOUND SETTINGS");
 
-			// volume
-			auto volume = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
-			volume->setValue((float)VolumeControl::getInstance()->getVolume());
-			s->addWithLabel("SYSTEM VOLUME", volume);
-			s->addSaveFunc([volume] { VolumeControl::getInstance()->setVolume((int)round(volume->getValue())); });
-			
-			if(Settings::getInstance()->getString("UIMode") == "Full")
-			{
-				// enable / disable sounds
-				auto sounds_enabled = std::make_shared<SwitchComponent>(mWindow);
-				sounds_enabled->setState(Settings::getInstance()->getBool("EnableSounds"));
-				s->addWithLabel("ENABLE SOUNDS", sounds_enabled);
-				s->addSaveFunc([sounds_enabled] { Settings::getInstance()->setBool("EnableSounds", sounds_enabled->getState()); });
-			}
-			mWindow->pushGui(s);
-	});
+		addEntry("SOUND SETTINGS", 0x777777FF, true, 
+			[this] {
+				auto s = new GuiSettings(mWindow, "SOUND SETTINGS");
 
-	addEntry("UI SETTINGS", 0x777777FF, true,
-		[this] {
-			// Wrap all the rest of the settings in the UI mode conditional:
-			if(Settings::getInstance()->getString("UIMode") == "Full")
-			{
+				// volume
+				auto volume = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+				volume->setValue((float)VolumeControl::getInstance()->getVolume());
+				s->addWithLabel("SYSTEM VOLUME", volume);
+				s->addSaveFunc([volume] { VolumeControl::getInstance()->setVolume((int)round(volume->getValue())); });
+
+				if(Settings::getInstance()->getString("UIMode") == "Full")
+				{
+					// enable / disable sounds
+					auto sounds_enabled = std::make_shared<SwitchComponent>(mWindow);
+					sounds_enabled->setState(Settings::getInstance()->getBool("EnableSounds"));
+					s->addWithLabel("ENABLE SOUNDS", sounds_enabled);
+					s->addSaveFunc([sounds_enabled] { Settings::getInstance()->setBool("EnableSounds", sounds_enabled->getState()); });
+				}
+				mWindow->pushGui(s);
+		});
+
+		addEntry("UI SETTINGS", 0x777777FF, true,
+		[this] {	
 				auto s = new GuiSettings(mWindow, "UI SETTINGS");
 				// UI mode
 				auto UImodeSelection = std::make_shared< OptionListComponent<std::string> >(mWindow, "UI MODE", false);
@@ -107,7 +103,22 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 				for(auto it = UImodes.begin(); it != UImodes.end(); it++)
 					UImodeSelection->add(*it, *it, Settings::getInstance()->getString("UIMode") == *it);
 				s->addWithLabel("UI MODE", UImodeSelection);
-				s->addSaveFunc([UImodeSelection] { Settings::getInstance()->setString("UIMode", UImodeSelection->getSelected()); });
+				s->addSaveFunc([UImodeSelection] 
+				{
+					LOG(LogDebug) << "Changing UI mode to" << UImodeSelection->getSelected();
+					bool needReload = false;
+					if(Settings::getInstance()->getString("UIMode") != UImodeSelection->getSelected())
+							needReload = true;
+					Settings::getInstance()->setString("UIMode", UImodeSelection->getSelected());
+					
+					Settings::getInstance()->setBool("FavoritesOnly", false); // reset favoritesOnly option upon mode change
+					
+					if(needReload)
+					{
+						ViewController::get()->reloadAll();
+						ViewController::get()->goToStart();
+					}
+				});
 
 				// screensaver time
 				auto screensaver_time = std::make_shared<SliderComponent>(mWindow, 0.f, 30.f, 1.f, "m");
@@ -181,11 +192,8 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 					});
 				}
 				mWindow->pushGui(s);
-			}
-	});
+			});
 
-	if(Settings::getInstance()->getString("UIMode") == "Full")
-	{
 		addEntry("CONFIGURE INPUT", 0x777777FF, true, 
 			[this] { 
 				mWindow->pushGui(new GuiDetectDevice(mWindow, false, nullptr));
@@ -220,8 +228,8 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 			row.addElement(std::make_shared<TextComponent>(window, "SHUTDOWN SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 			s->addRow(row);
 
-			if( (Settings::getInstance()->getBool("ShowExit")) &&
-				(Settings::getInstance()->getString("UIMode") == "Full"))
+			if (Settings::getInstance()->getBool("ShowExit"))
+					//&& (Settings::getInstance()->getString("UIMode") == "Full")
 			{
 				row.elements.clear();
 				row.makeAcceptInputHandler([window] {

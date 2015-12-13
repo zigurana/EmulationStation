@@ -140,7 +140,6 @@ void parseGamelist(SystemData* system)
 
 void addFileDataNode(pugi::xml_node& parent, const FileData* file, const char* tag, SystemData* system)
 {
-	LOG(LogDebug) << "addFileDataNode(" << file->getCleanName() << ")";
 	//create game and add to parent node
 	pugi::xml_node newNode = parent.append_child(tag);
 
@@ -206,40 +205,42 @@ void updateGamelist(SystemData* system)
 	if (rootFolder != nullptr)
 	{
 		//get only files, no folders
-		std::vector<FileData*> files = rootFolder->getFilesRecursive(GAME | FOLDER);
+		std::vector<FileData*> files = rootFolder->getFilesRecursive(GAME | FOLDER, false, false, false);
 		//iterate through all files, checking if they're already in the XML
-		std::vector<FileData*>::const_iterator fit = files.cbegin();
-		while(fit != files.cend())
+		if(files.size() > 0)
 		{
-			const char* tag = ((*fit)->getType() == GAME) ? "game" : "folder";
-
-			// check if the file already exists in the XML
-			// if it does, remove it before adding
-			for(pugi::xml_node fileNode = root.child(tag); fileNode; fileNode = fileNode.next_sibling(tag))
+			std::vector<FileData*>::const_iterator fit = files.cbegin();
+			while(fit != files.cend())
 			{
-				pugi::xml_node pathNode = fileNode.child("path");
-				if(!pathNode)
+				const char* tag = ((*fit)->getType() == GAME) ? "game" : "folder";
+
+				// check if the file already exists in the XML
+				// if it does, remove it before adding
+				for(pugi::xml_node fileNode = root.child(tag); fileNode; fileNode = fileNode.next_sibling(tag))
 				{
-					LOG(LogError) << "<" << tag << "> node contains no <path> child!";
-					continue;
+					pugi::xml_node pathNode = fileNode.child("path");
+					if(!pathNode)
+					{
+						LOG(LogError) << "<" << tag << "> node contains no <path> child!";
+						continue;
+					}
+
+					fs::path nodePath = resolvePath(pathNode.text().get(), system->getStartPath(), true);
+					fs::path gamePath((*fit)->getPath());
+					if(nodePath == gamePath || (fs::exists(nodePath) && fs::exists(gamePath) && fs::equivalent(nodePath, gamePath)))
+					{
+						// found it
+						root.remove_child(fileNode);
+						break;
+					}
 				}
 
-				fs::path nodePath = resolvePath(pathNode.text().get(), system->getStartPath(), true);
-				fs::path gamePath((*fit)->getPath());
-				if(nodePath == gamePath || (fs::exists(nodePath) && fs::exists(gamePath) && fs::equivalent(nodePath, gamePath)))
-				{
-					// found it
-					root.remove_child(fileNode);
-					break;
-				}
+				// it was either removed or never existed to begin with; either way, we can add it now
+				addFileDataNode(root, *fit, tag, system);
+
+				++fit;
 			}
-
-			// it was either removed or never existed to begin with; either way, we can add it now
-			addFileDataNode(root, *fit, tag, system);
-
-			++fit;
 		}
-
 		//now write the file
 
 		//make sure the folders leading up to this path exist (or the write will fail)

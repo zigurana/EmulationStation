@@ -85,7 +85,6 @@ MetaDataList MetaDataList::createFromXML(MetaDataListType type, pugi::xml_node n
 
 void MetaDataList::appendToXML(pugi::xml_node parent, bool ignoreDefaults, const fs::path& relativeTo) const
 {
-	LOG(LogDebug) << "appendToXML()";
 	const std::vector<MetaDataDecl>& mdd = getMDD();
 
 	for(auto mddIter = mdd.begin(); mddIter != mdd.end(); mddIter++)

@@ -48,15 +48,11 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 
 	mMenu.addWithLabel("SORT GAMES BY", mListSort);
 	
-	// Show favorites / kidgame only menu option - only for UI mode is Full or Kiosk
-	if( (Settings::getInstance()->getString("UIMode") == "Full") ||
-			(Settings::getInstance()->getString("UIMode") == "Kiosk"))
-	{
-		auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
-		favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
-		mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
-		addSaveFunc([favorite_only] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); });
-	}
+	// Show favorites-only
+	auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
+	favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
+	mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
+	addSaveFunc([favorite_only] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); });
 	
 	// edit game metadata - only in Full UI mode
 	if(Settings::getInstance()->getString("UIMode") == "Full")

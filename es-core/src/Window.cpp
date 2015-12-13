@@ -384,13 +384,25 @@ void Window::ListenForPassKeySequence(InputConfig* config, Input input)
 		mPasskeyCounter = 0; // current input is incorrect, reset counter
 	}
 		
-	if (mPasskeyCounter >= (passkeyseq.length()-1))
+	if (mPasskeyCounter >= (passkeyseq.length()))
 	{
 		// When we have reached the end of the list, trigger UI_mode unlock
 		LOG(LogDebug) << "Window::ListenForPassKeySequence(): Passkey sequence completed, switching UIMode to full";
 		Settings::getInstance()->setString("UIMode", "Full");
+		Settings::getInstance()->saveFile();
+		//mRestartNeeded = true;
+		mPasskeyCounter = 0;
+		while (true)
+		{
+		if(Settings::getInstance()->getString("UIMode") == "Full")
+			break;
+		}
+		SDL_Event ev;
+		ev.type = SDL_QUIT;
+		SDL_PushEvent(&ev);
+				
 		// TODO something to trigger screen reload, look at 
 		//ViewController::get()->reloadAll();
-		mPasskeyCounter = 0;
+
 	}
 }

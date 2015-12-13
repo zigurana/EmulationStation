@@ -27,8 +27,8 @@ public:
 	void setAllInvalidGamesList(SystemData* systemExclude);
 
 	// Navigation.
-	void goToNextGameList();
-	void goToPrevGameList();
+	void goToNextGameList(bool bhidden, bool bfav, bool bkid);
+	void goToPrevGameList(bool bhidden, bool bfav, bool bkid);
 	void goToGameList(SystemData* system);
 	void goToSystemView(SystemData* system);
 	void goToStart();

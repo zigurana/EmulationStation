@@ -343,11 +343,11 @@ std::vector<HelpPrompt> DetailedGameListView::getHelpPrompts()
 	prompts.push_back(HelpPrompt("up/down", "choose"));
 	prompts.push_back(HelpPrompt("a", "launch"));
 	prompts.push_back(HelpPrompt("b", "back"));
-	if (mSystem->getHasKidGames())
+	if (mSystem->getHasKidGames() && (Settings::getInstance()->getString("UIMode") == "Full"))
 	{
 		prompts.push_back(HelpPrompt("y", "Kid-game"));
 	}
-	if (mSystem->getHasFavorites())
+	if (mSystem->getHasFavorites() && (Settings::getInstance()->getString("UIMode") == "Full"))
 	{
 		prompts.push_back(HelpPrompt("x", "favorite"));
 	}

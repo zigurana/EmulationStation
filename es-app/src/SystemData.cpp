@@ -426,25 +426,11 @@ bool SystemData::hasGamelist() const
 	return (fs::exists(getGamelistPath(false)));
 }
 
-unsigned int SystemData::getGameCount() const
+unsigned int SystemData::getGameCount(bool filterHidden, bool filterFav, bool filterKid) const
 {
-	return mRootFolder->getFilesRecursive(GAME).size();
+	return mRootFolder->getFilesRecursive(GAME,filterHidden, filterFav, filterKid).size();
 }
 
-unsigned int SystemData::getFavoritesCount() const
-{
-	return mRootFolder->getFavoritesRecursive(GAME).size();
-}
-
-unsigned int SystemData::getKidGamesCount() const
-{
-	return mRootFolder->getKidGamesRecursive(GAME).size();
-}
-
-unsigned int SystemData::getHiddenCount() const
-{
-	return mRootFolder->getHiddenRecursive(GAME).size();
-}
 void SystemData::loadTheme()
 {
 	mTheme = std::make_shared<ThemeData>();

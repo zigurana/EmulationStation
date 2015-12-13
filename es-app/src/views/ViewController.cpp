@@ -69,20 +69,29 @@ void ViewController::goToSystemView(SystemData* system)
 	playViewTransition();
 }
 
-void ViewController::goToNextGameList()
+void ViewController::goToNextGameList(bool bhidden, bool bfav, bool bkid)
 {
 	assert(mState.viewing == GAME_LIST);
 	SystemData* system = getState().getSystem();
 	assert(system);
-	goToGameList(system->getNext());
+	do
+	{
+		system = getState().getSystem();
+		goToGameList(system->getNext());
+	}while(system->getNext()->getGameCount(bhidden, bfav, bkid) == 0);
+	
 }
 
-void ViewController::goToPrevGameList()
+void ViewController::goToPrevGameList(bool bhidden, bool bfav, bool bkid)
 {
 	assert(mState.viewing == GAME_LIST);
 	SystemData* system = getState().getSystem();
 	assert(system);
-	goToGameList(system->getPrev());
+	do
+	{
+		system = getState().getSystem();
+		goToGameList(system->getPrev());
+	}while(system->getPrev()->getGameCount(bhidden, bfav, bkid) == 0);
 }
 
 void ViewController::goToGameList(SystemData* system)
@@ -318,13 +327,16 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 
 	//decide type
 	bool detailed = false;
-	std::vector<FileData*> files = system->getRootFolder()->getFilesRecursive(GAME | FOLDER);
-	for(auto it = files.begin(); it != files.end(); it++)
+	std::vector<FileData*> files = system->getRootFolder()->getFilesRecursive(GAME | FOLDER, false, false, false);
+	if (files.size() > 0)
 	{
-		if(!(*it)->getThumbnailPath().empty())
+		for(auto it = files.begin(); it != files.end(); it++)
 		{
-			detailed = true;
-			break;
+			if(!(*it)->getThumbnailPath().empty())
+			{
+				detailed = true;
+				break;
+			}
 		}
 	}
 		

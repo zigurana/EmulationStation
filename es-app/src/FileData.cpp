@@ -80,25 +80,56 @@ const std::string& FileData::getThumbnailPath() const
 }
 
 
-std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask) const
+std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const
 {
-	std::vector<FileData*> out;
+	//LOG(LogDebug) << "FileData::getFilesRecursive(filterhidden =" << filterHidden <<", filterFav = " << filterFav << ", filterKid = "<< filterKid << ")";
+	std::vector<FileData*> fileList;
 
+	// first populate with all we can find
 	for(auto it = mChildren.begin(); it != mChildren.end(); it++)
 	{
 		if((*it)->getType() & typeMask)
-			out.push_back(*it);
+			fileList.push_back(*it);
 		
 		if((*it)->getChildren().size() > 0)
 		{
-			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask);
-			out.insert(out.end(), subchildren.cbegin(), subchildren.cend());
+			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask, filterHidden, filterFav, filterKid);
+			fileList.insert(fileList.end(), subchildren.cbegin(), subchildren.cend());
+		}
+	}
+		
+	// then filter all we do not want.
+	if(filterHidden)
+	{
+		fileList = filterFileData(fileList, "hidden", "false");
+	}
+	if(filterFav)
+	{
+		fileList = filterFileData(fileList, "favorite", "true");
+	}
+	if(filterKid)
+	{
+		fileList = filterFileData(fileList, "kidgame", "true");
+	}
+	return fileList;
+}
+
+std::vector<FileData*> FileData::filterFileData(std::vector<FileData*> in, std::string filtername, std::string passString) const
+{
+	std::vector<FileData*> out;
+
+	for (auto it = in.begin(); it != in.end(); it++)
+	{
+		//LOG(LogDebug) << (*it)->getName() << ":" <<  filtername << " = " << (*it)->metadata.get(filtername);
+		if ((*it)->metadata.get(filtername).compare(passString) == 0)
+		{
+			out.push_back(*it);
 		}
 	}
 
 	return out;
 }
-
+/*
 std::vector<FileData*> FileData::getFavoritesRecursive(unsigned int typeMask) const
 {
 	std::vector<FileData*> out;
@@ -117,7 +148,6 @@ std::vector<FileData*> FileData::getFavoritesRecursive(unsigned int typeMask) co
 
 std::vector<FileData*> FileData::getKidGamesRecursive(unsigned int typeMask) const
 {
-	LOG(LogDebug) << "FileData::getKidGamesRecursive(typeMask = " << typeMask << ")";
 	std::vector<FileData*> out;
 	std::vector<FileData*> files = getFilesRecursive(typeMask);
 
@@ -132,24 +162,19 @@ std::vector<FileData*> FileData::getKidGamesRecursive(unsigned int typeMask) con
 
 	return out;
 }
-std::vector<FileData*> FileData::getHiddenRecursive(unsigned int typeMask) const
+std::vector<FileData*> FileData::getVisibleRecursive(unsigned int typeMask) const
 {
-	LOG(LogDebug) << "FileData::getHiddenRecursive(typeMask = " << typeMask << ")";
 	std::vector<FileData*> out;
 	std::vector<FileData*> files = getFilesRecursive(typeMask);
 
 	for (auto it = files.begin(); it != files.end(); it++)
 	{
-		if ((*it)->metadata.get("hidden").compare("true") == 0)
-		{
-			LOG(LogDebug) << "Hidden found: " << (*it)->metadata.get("name");
-			out.push_back(*it);
-		}
+
 	}
 
 	return out;
 }
-
+*/
 void FileData::addChild(FileData* file)
 {
 	assert(mType == FOLDER);
