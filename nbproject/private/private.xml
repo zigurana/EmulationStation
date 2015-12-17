@@ -12,6 +12,9 @@
         <group name="Group 20151103-09:57:27">
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputConfig.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/MetaData.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiFastSelect.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/BasicGameListView.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/components/ScraperSearchComponent.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/Gamelist.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Settings.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/FileData.cpp</file>
@@ -20,7 +23,10 @@
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/SystemData.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/ViewController.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputConfig.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/ISimpleGameListView.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Window.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/MetaData.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/ISimpleGameListView.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/ComponentGrid.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/EmulationStation.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiMenu.cpp</file>
@@ -30,6 +36,7 @@
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiSettings.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/SystemData.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Window.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/DetailedGameListView.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputManager.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/ScraperCmdLine.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiScraperStart.cpp</file>

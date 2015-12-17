@@ -69,28 +69,31 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 
 				mWindow->pushGui(s);
 		});
+	}
 
-		addEntry("SOUND SETTINGS", 0x777777FF, true, 
-			[this] {
-				auto s = new GuiSettings(mWindow, "SOUND SETTINGS");
+	addEntry("SOUND SETTINGS", 0x777777FF, true, 
+		[this] {
+			auto s = new GuiSettings(mWindow, "SOUND SETTINGS");
 
-				// volume
-				auto volume = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
-				volume->setValue((float)VolumeControl::getInstance()->getVolume());
-				s->addWithLabel("SYSTEM VOLUME", volume);
-				s->addSaveFunc([volume] { VolumeControl::getInstance()->setVolume((int)round(volume->getValue())); });
+			// volume
+			auto volume = std::make_shared<SliderComponent>(mWindow, 0.f, 100.f, 1.f, "%");
+			volume->setValue((float)VolumeControl::getInstance()->getVolume());
+			s->addWithLabel("SYSTEM VOLUME", volume);
+			s->addSaveFunc([volume] { VolumeControl::getInstance()->setVolume((int)round(volume->getValue())); });
 
-				if(Settings::getInstance()->getString("UIMode") == "Full")
-				{
-					// enable / disable sounds
-					auto sounds_enabled = std::make_shared<SwitchComponent>(mWindow);
-					sounds_enabled->setState(Settings::getInstance()->getBool("EnableSounds"));
-					s->addWithLabel("ENABLE SOUNDS", sounds_enabled);
-					s->addSaveFunc([sounds_enabled] { Settings::getInstance()->setBool("EnableSounds", sounds_enabled->getState()); });
-				}
-				mWindow->pushGui(s);
-		});
+			if(Settings::getInstance()->getString("UIMode") == "Full")
+			{
+				// enable / disable sounds
+				auto sounds_enabled = std::make_shared<SwitchComponent>(mWindow);
+				sounds_enabled->setState(Settings::getInstance()->getBool("EnableSounds"));
+				s->addWithLabel("ENABLE SOUNDS", sounds_enabled);
+				s->addSaveFunc([sounds_enabled] { Settings::getInstance()->setBool("EnableSounds", sounds_enabled->getState()); });
+			}
+			mWindow->pushGui(s);
+	});
 
+	if(Settings::getInstance()->getString("UIMode") == "Full")
+	{
 		addEntry("UI SETTINGS", 0x777777FF, true,
 		[this] {	
 				auto s = new GuiSettings(mWindow, "UI SETTINGS");
@@ -228,8 +231,9 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 			row.addElement(std::make_shared<TextComponent>(window, "SHUTDOWN SYSTEM", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 			s->addRow(row);
 
-			if (Settings::getInstance()->getBool("ShowExit"))
-					//&& (Settings::getInstance()->getString("UIMode") == "Full")
+			if (Settings::getInstance()->getBool("ShowExit") &&
+				((Settings::getInstance()->getString("UIMode") == "Full") ||
+				 (Settings::getInstance()->getBool("Debug"))))
 			{
 				row.elements.clear();
 				row.makeAcceptInputHandler([window] {

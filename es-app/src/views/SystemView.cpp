@@ -296,7 +296,7 @@ void SystemView::onCursorChanged(const CursorState& state)
 			{
 				ss << ", " << favoritesCount << " FAVORITES";
 			}
-			ss << ") AVAILABLE.";
+			ss << " AVAILABLE.";
 		}
 
 		mSystemInfo.setText(ss.str());
