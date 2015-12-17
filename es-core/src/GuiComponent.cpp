@@ -185,7 +185,7 @@ const Eigen::Affine3f& GuiComponent::getTransform()
 
 void GuiComponent::setValue(const std::string& value)
 {
-	LOG(LogDebug)<< "GuiComponent::setValue(), this is an empty function, use overrides instead!"
+	LOG(LogDebug)<< "GuiComponent::setValue(), this is an empty function, use overrides instead!";
 }
 
 std::string GuiComponent::getValue() const
