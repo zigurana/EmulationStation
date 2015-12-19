@@ -54,7 +54,6 @@ void SystemView::populate()
 	for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
 	{
 		LOG(LogDebug) << "System = " << (*it)->getName();
-
 		
 		if ((*it)->getGameCount(filterHidden, filterFav, filterKid) > 0)
 		{

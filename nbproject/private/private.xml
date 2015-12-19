@@ -13,12 +13,12 @@
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputConfig.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/MetaData.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiFastSelect.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiMenu.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/BasicGameListView.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/components/ScraperSearchComponent.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/Gamelist.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Settings.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/FileData.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/SystemView.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/ViewController.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/SystemData.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/ViewController.h</file>
@@ -42,9 +42,10 @@
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiScraperStart.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiGamelistOptions.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/FileData.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/GuiComponent.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/SystemView.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/GuiComponent.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/GuiComponent.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/PlatformId.h</file>
         </group>
     </open-files>
 </project-private>
