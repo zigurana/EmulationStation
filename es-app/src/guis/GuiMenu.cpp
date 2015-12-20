@@ -106,16 +106,48 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 				for(auto it = UImodes.begin(); it != UImodes.end(); it++)
 					UImodeSelection->add(*it, *it, Settings::getInstance()->getString("UIMode") == *it);
 				s->addWithLabel("UI MODE", UImodeSelection);
-				s->addSaveFunc([UImodeSelection] 
+				Window* window = mWindow;
+				s->addSaveFunc([UImodeSelection, window] 
 				{
 					LOG(LogDebug) << "Changing UI mode to" << UImodeSelection->getSelected();
+					
 					bool needReload = false;
 					if(Settings::getInstance()->getString("UIMode") != UImodeSelection->getSelected())
-							needReload = true;
-					Settings::getInstance()->setString("UIMode", UImodeSelection->getSelected());
-					
-					Settings::getInstance()->setBool("FavoritesOnly", false); // reset favoritesOnly option upon mode change
-					
+					{
+						needReload = true;
+						bool filterHidden = false;
+						bool filterKid = false;
+						bool filterFav = false;
+						if (UImodeSelection->getSelected() != "Full")
+						{
+							filterHidden = true;
+						}
+						if (UImodeSelection->getSelected() == "Kid")
+						{
+							filterKid = true;
+						}
+
+						LOG(LogDebug) << "Checking if the proposed UI mode has anything at all to show:";
+						int count = 0; 
+						
+						for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
+						{
+							LOG(LogDebug) << "System = " << (*it)->getName() << ", "<< (*it)->getGameCount(filterHidden, filterFav, filterKid) << " games found";
+							count += (*it)->getGameCount(filterHidden, filterFav, filterKid);
+						}
+						if (count == 0)
+						{
+							LOG(LogDebug) << "Nothing to show in selected mode (" << UImodeSelection->getSelected() << "), resetting to full";
+							window->pushGui(new GuiMsgBox(window, "The selected view modus has nothing to show,\n resetting to UI mode = FULL",
+									"OK", nullptr));
+							Settings::getInstance()->setString("UIMode", "Full");
+							needReload = false;
+						}else
+						{
+							Settings::getInstance()->setString("UIMode", UImodeSelection->getSelected());
+							Settings::getInstance()->setBool("FavoritesOnly", false); // reset favoritesOnly option upon mode change
+						}		
+					}
 					if(needReload)
 					{
 						ViewController::get()->reloadAll();
