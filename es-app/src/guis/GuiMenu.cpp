@@ -138,7 +138,7 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 						if (count == 0)
 						{
 							LOG(LogDebug) << "Nothing to show in selected mode (" << UImodeSelection->getSelected() << "), resetting to full";
-							window->pushGui(new GuiMsgBox(window, "The selected view modus has nothing to show,\n resetting to UI mode = FULL",
+							window->pushGui(new GuiMsgBox(window, "The selected view mode has nothing to show,\n returning to UI mode = FULL",
 									"OK", nullptr));
 							Settings::getInstance()->setString("UIMode", "Full");
 							needReload = false;
