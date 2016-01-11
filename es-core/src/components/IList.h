@@ -7,6 +7,7 @@
 #include "components/ImageComponent.h"
 #include "resources/Font.h"
 #include "Renderer.h"
+#include "Log.h"
 
 enum CursorState
 {
@@ -107,9 +108,13 @@ public:
 
 	void clear()
 	{
+		LOG(LogDebug) << "IList::clear()";
 		mEntries.clear();
+		LOG(LogDebug) << "IList::clear():1";
 		mCursor = 0;
+		LOG(LogDebug) << "IList::clear():2";
 		listInput(0);
+		LOG(LogDebug) << "IList::clear():3";
 		onCursorChanged(CURSOR_STOPPED);
 	}
 

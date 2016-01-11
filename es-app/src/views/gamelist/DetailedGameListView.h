@@ -6,7 +6,7 @@
 #include "components/DateTimeComponent.h"
 #include "SystemData.h"
 
-class DetailedGameListView : public BasicGameListView
+class DetailedGameListView : public BasicGameListView 
 {
 public:
 	DetailedGameListView(Window* window, FileData* root, SystemData* system);
@@ -28,7 +28,7 @@ private:
 
 	ImageComponent mImage;
 
-	TextComponent mLblRating, mLblReleaseDate, mLblDeveloper, mLblPublisher, mLblGenre, mLblPlayers, mLblLastPlayed, mLblPlayCount, mLblFavorite, mLblKidGame;
+	TextComponent mLblRating, mLblReleaseDate, mLblDeveloper, mLblPublisher, mLblGenre, mLblPlayers, mLblLastPlayed, mLblPlayCount;
 
 	RatingComponent mRating;
 	DateTimeComponent mReleaseDate;
@@ -38,8 +38,9 @@ private:
 	TextComponent mPlayers;
 	DateTimeComponent mLastPlayed;
 	TextComponent mPlayCount;
-	TextComponent mFavorite;
-	TextComponent mKidGame;
+	ImageComponent mFavorite;
+	ImageComponent mKidGame;
+	ImageComponent mHidden;
 	
 	std::vector<TextComponent*> getMDLabels();
 	std::vector<GuiComponent*> getMDValues();

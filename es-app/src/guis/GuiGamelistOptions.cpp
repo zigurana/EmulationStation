@@ -5,6 +5,7 @@
 #include "views/ViewController.h"
 #include "components/SwitchComponent.h"
 #include "guis/GuiSettings.h"
+#include "Log.h"
 
 GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : GuiComponent(window), 
 	mSystem(system), 
@@ -73,15 +74,21 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 
 GuiGamelistOptions::~GuiGamelistOptions()
 {
+	LOG(LogDebug) << "GUIGamelistOptions::~GuiGamelistOptions()";
 	// apply sort
 	FileData* root = getGamelist()->getCursor()->getSystem()->getRootFolder();
 	root->sort(*mListSort->getSelected()); // will also recursively sort children
-
+	
 	// notify that the root folder was sorted
+	
 	getGamelist()->onFileChanged(root, FILE_SORTED);
 
+	LOG(LogDebug) << "settings.favoritesonly = " << Settings::getInstance()->getBool("FavoritesOnly"); 
+	LOG(LogDebug) << "favoritesstate = " << mFavoriteState; 
+				
 	if (Settings::getInstance()->getBool("FavoritesOnly") != mFavoriteState)
 	{
+		LOG(LogDebug) << "  GUIGamelistOptions::~GuiGamelistOptions(): reloading GameList";
 		ViewController::get()->setAllInvalidGamesList(getGamelist()->getCursor()->getSystem());
 		ViewController::get()->reloadGameListView(getGamelist()->getCursor()->getSystem());
 	}
@@ -142,9 +149,11 @@ bool GuiGamelistOptions::input(InputConfig* config, Input input)
 {
 	if((config->isMappedTo("b", input) || config->isMappedTo("select", input)) && input.value)
 	{
+		LOG(LogDebug) << "GUIGamelistOptions::input(): b detected, saving.";
 		save();
+		LOG(LogDebug) << "GUIGamelistOptions::input(): done.";
 		delete this;
-		return true;
+		return true;		
 	}
 
 	return mMenu.input(config, input);
@@ -159,11 +168,13 @@ std::vector<HelpPrompt> GuiGamelistOptions::getHelpPrompts()
 
 IGameListView* GuiGamelistOptions::getGamelist()
 {
+	LOG(LogDebug) << "GuiGamelistOptions::getGamelist()";
 	return ViewController::get()->getGameListView(mSystem).get();
 }
 
 void GuiGamelistOptions::save()
 {
+	LOG(LogDebug) << "GUIGamelistOptions::save()";
 	if (!mSaveFuncs.size())
 		return;
 
@@ -171,4 +182,5 @@ void GuiGamelistOptions::save()
 		(*it)();
 
 	Settings::getInstance()->saveFile();
+	LOG(LogDebug) << "GUIGamelistOptions::save(): done";
 }

@@ -11,6 +11,7 @@
 BasicGameListView::BasicGameListView(Window* window, FileData* root)
 	: ISimpleGameListView(window, root), mList(window)
 {
+	LOG(LogDebug) << "BasicGameListView::BasicGameListView()";
 	mList.setSize(mSize.x(), mSize.y() * 0.8f);
 	mList.setPosition(0, mSize.y() * 0.2f);
 	addChild(&mList);
@@ -41,9 +42,9 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 {
 	LOG(LogDebug) << "BasicGameListView::populateList()";
 	mList.clear();
-
+	LOG(LogDebug) << "BasicGameListView::populateList():0";
 	mHeaderText.setText(files.at(0)->getSystem()->getFullName());
-
+	LOG(LogDebug) << "BasicGameListView::populateList():1";
 	bool hasFavorites = false;
 	bool hasKidGames = false;
 	if (Settings::getInstance()->getBool("FavoritesOnly"))
@@ -62,6 +63,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 				}
 			}
 		}
+		LOG(LogDebug) << "BasicGameListView::populateList()2";
 	}else if (Settings::getInstance()->getString("UIMode") == "Kid")
 	{
 		LOG(LogDebug)<< "trying to find kid games";
@@ -80,15 +82,18 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 			}
 		}
 	}
-
+	LOG(LogDebug) << "BasicGameListView::populateList():3";
 	for(auto it = files.begin(); it != files.end(); it++)
 	{
 		if ((*it)->getType() == GAME)
 		{
 			if (Settings::getInstance()->getString("UIMode") == "Full")
 			{
+				LOG(LogDebug) << "BasicGameListView::populateList():4";
+
 				if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
 				{
+					LOG(LogDebug) << "BasicGameListView::populateList():5";
 					if((*it)->metadata.get("favorite").compare("true") == 0)
 					{
 						LOG(LogDebug) << "UImode=full, Fav only";
@@ -96,13 +101,16 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 					}
 				}else 
 				{
+					LOG(LogDebug) << "BasicGameListView::populateList():6";
 					//LOG(LogDebug) << "UImode=full";
 					mList.add((*it)->getName(), *it, ((*it)->getType() == FOLDER));
 				}
 			}else if (Settings::getInstance()->getString("UIMode") == "Kiosk") // filter hidden
 			{
+				LOG(LogDebug) << "BasicGameListView::populateList():7";
 				if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
 				{
+					LOG(LogDebug) << "BasicGameListView::populateList():8";
 					if(((*it)->metadata.get("favorite").compare("true") == 0) &&
 					   ((*it)->metadata.get("hidden").compare("false") == 0))
 					{
@@ -111,6 +119,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 					}
 				}else 
 				{
+					LOG(LogDebug) << "BasicGameListView::populateList():9";
 					if((*it)->metadata.get("hidden").compare("false") == 0)
 					{
 						LOG(LogDebug) << "UImode=kiosk, !hidden";
@@ -119,6 +128,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 				}
 			}else if ((Settings::getInstance()->getString("UIMode") == "Kid") && hasKidGames) // filter all non kid-game
 			{
+				LOG(LogDebug) << "BasicGameListView::populateList():10";
 				if (Settings::getInstance()->getBool("FavoritesOnly") && hasFavorites)
 				{
 					if(((*it)->metadata.get("favorite").compare("true") == 0) &&
@@ -130,6 +140,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 					}
 				}else 
 				{
+					LOG(LogDebug) << "BasicGameListView::populateList():11";
 					if(((*it)->metadata.get("hidden").compare("false") == 0) &&
 					   ((*it)->metadata.get("kidgame").compare("true") == 0))
 					{
@@ -140,6 +151,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 			}
 		}
 	}
+	LOG(LogDebug) << "BasicGameListView::populateList():done";
 }
 
 FileData* BasicGameListView::getCursor()

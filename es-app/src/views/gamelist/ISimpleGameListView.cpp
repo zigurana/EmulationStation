@@ -6,6 +6,7 @@
 #include "Sound.h"
 #include "Settings.h"
 #include "Gamelist.h"
+#include "Log.h"
 
 ISimpleGameListView::ISimpleGameListView(Window* window, FileData* root) : IGameListView(window, root),
 mHeaderText(window), mHeaderImage(window), mBackground(window), mThemeExtras(window), mFavoriteChange(false), mKidGameChange(false)
@@ -63,6 +64,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 	{
 		if(config->isMappedTo("a", input))
 		{
+			LOG(LogDebug) << "ISimpleGameListView::input(): a detected!";
 			FileData* cursor = getCursor();
 			if(cursor->getType() == GAME)
 			{
@@ -80,6 +82,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			return true;
 		}else if(config->isMappedTo("b", input))
 		{
+			LOG(LogDebug) << "ISimpleGameListView::input(): b detected!";
 			if(mCursorStack.size())
 			{
 				populateList(mCursorStack.top()->getParent()->getChildren());
@@ -106,6 +109,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 		}else if (config->isMappedTo("x", input))
 		{
 			FileData* cursor = getCursor();
+			LOG(LogDebug) << "ISimpleGameListView::input(): x detected!";
 			if (cursor->getSystem()->getHasFavorites())
 			{
 				if (cursor->getType() == GAME)
@@ -113,6 +117,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					mFavoriteChange = true;
 					MetaDataList* md = &cursor->metadata;
 					std::string value = md->get("favorite");
+					LOG(LogDebug) << "Favorite = "<< value;
 					if (value.compare("false") == 0)
 					{
 						md->set("favorite", "true");
@@ -121,11 +126,13 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					{
 						md->set("favorite", "false");
 					}
+					LOG(LogDebug) << "New Favorite value set to: "<< md->get("favorite");
 					updateInfoPanel();
 				}
 			}
 		}else if (config->isMappedTo("y", input))
 		{
+			LOG(LogDebug) << "ISimpleGameListView::input(): y detected!";
 			FileData* cursor = getCursor();
 			if (cursor->getSystem()->getHasKidGames() && !mFilterHidden) // only when kidgames are supported by system+theme, and when in UImode=full
 			{
@@ -134,6 +141,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					mKidGameChange = true;
 					MetaDataList* md = &cursor->metadata;
 					std::string value = md->get("kidgame");
+					LOG(LogDebug) << "kidgame = "<< value;
 					if (value.compare("false") == 0)
 					{
 						md->set("kidgame", "true");
@@ -142,6 +150,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					{
 						md->set("kidgame", "false");
 					}
+					LOG(LogDebug) << "New kidgame value set to: "<< md->get("kidgame");
 					updateInfoPanel();
 				}
 			}
