@@ -91,15 +91,10 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 				Sound::getFromTheme(getTheme(), getName(), "back")->play();
 			}else{
 				onFocusLost();
-
-				if (mFavoriteChange)
+				if (mFavoriteChange || mKidGameChange)
 				{
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mFavoriteChange = false;
-				}
-				if (mKidGameChange)
-				{
-					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mKidGameChange = false;
 				}
 				ViewController::get()->goToSystemView(getCursor()->getSystem());
@@ -121,8 +116,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					if (value.compare("false") == 0)
 					{
 						md->set("favorite", "true");
-					}
-					else
+					}else
 					{
 						md->set("favorite", "false");
 					}
@@ -145,8 +139,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					if (value.compare("false") == 0)
 					{
 						md->set("kidgame", "true");
-					}
-					else
+					}					else
 					{
 						md->set("kidgame", "false");
 					}
@@ -159,14 +152,10 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			if(Settings::getInstance()->getBool("QuickSystemSelect"))
 			{
 				onFocusLost();
-				if (mFavoriteChange)
+				if (mFavoriteChange || mKidGameChange)
 				{
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mFavoriteChange = false;
-				}
-				if (mKidGameChange)
-				{
-					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mKidGameChange = false;
 				}
 				ViewController::get()->goToNextGameList(mFilterHidden, mFilterFav, mFilterKid);
@@ -177,14 +166,10 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			if(Settings::getInstance()->getBool("QuickSystemSelect"))
 			{
 				onFocusLost();
-				if (mFavoriteChange)
+				if (mFavoriteChange || mKidGameChange)
 				{
 					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mFavoriteChange = false;
-				}
-				if (mKidGameChange)
-				{
-					ViewController::get()->setInvalidGamesList(getCursor()->getSystem());
 					mKidGameChange = false;
 				}
 				ViewController::get()->goToPrevGameList(mFilterHidden, mFilterFav, mFilterKid);

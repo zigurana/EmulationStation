@@ -11,6 +11,7 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	mSystem(system), 
 	mMenu(window, "OPTIONS")
 {
+	LOG(LogDebug) << "GUIGamelistOptions::GuiGamelistOptions()";
 	addChild(&mMenu);
 
 	// jump to letter
@@ -81,11 +82,7 @@ GuiGamelistOptions::~GuiGamelistOptions()
 	
 	// notify that the root folder was sorted
 	
-	getGamelist()->onFileChanged(root, FILE_SORTED);
-
-	LOG(LogDebug) << "settings.favoritesonly = " << Settings::getInstance()->getBool("FavoritesOnly"); 
-	LOG(LogDebug) << "favoritesstate = " << mFavoriteState; 
-				
+	getGamelist()->onFileChanged(root, FILE_SORTED);				
 	if (Settings::getInstance()->getBool("FavoritesOnly") != mFavoriteState)
 	{
 		LOG(LogDebug) << "  GUIGamelistOptions::~GuiGamelistOptions(): reloading GameList";
@@ -149,9 +146,7 @@ bool GuiGamelistOptions::input(InputConfig* config, Input input)
 {
 	if((config->isMappedTo("b", input) || config->isMappedTo("select", input)) && input.value)
 	{
-		LOG(LogDebug) << "GUIGamelistOptions::input(): b detected, saving.";
 		save();
-		LOG(LogDebug) << "GUIGamelistOptions::input(): done.";
 		delete this;
 		return true;		
 	}
@@ -168,13 +163,11 @@ std::vector<HelpPrompt> GuiGamelistOptions::getHelpPrompts()
 
 IGameListView* GuiGamelistOptions::getGamelist()
 {
-	LOG(LogDebug) << "GuiGamelistOptions::getGamelist()";
 	return ViewController::get()->getGameListView(mSystem).get();
 }
 
 void GuiGamelistOptions::save()
 {
-	LOG(LogDebug) << "GUIGamelistOptions::save()";
 	if (!mSaveFuncs.size())
 		return;
 
@@ -182,5 +175,4 @@ void GuiGamelistOptions::save()
 		(*it)();
 
 	Settings::getInstance()->saveFile();
-	LOG(LogDebug) << "GUIGamelistOptions::save(): done";
 }

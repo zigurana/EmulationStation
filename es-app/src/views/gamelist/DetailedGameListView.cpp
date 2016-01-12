@@ -210,9 +210,8 @@ void DetailedGameListView::initMDValues()
 
 void DetailedGameListView::updateInfoPanel()
 {
+	LOG(LogDebug) << "DetailedGameListView::UpdateInfoPanel()";
 	FileData* file = (mList.size() == 0 || mList.isScrolling()) ? NULL : mList.getSelected();
-
-	LOG(LogDebug) << "DetailedGameListView::UpdateInfoPanel(game = " << file->metadata.get("name") <<")";
 
 	bool fadingOut;
 	if(file == NULL)
@@ -235,12 +234,8 @@ void DetailedGameListView::updateInfoPanel()
 			mPlayers.setValue(file->metadata.get("players"));
 			mLastPlayed.setValue(file->metadata.get("lastplayed"));
 			mPlayCount.setValue(file->metadata.get("playcount"));
-			
-			LOG(LogDebug) << "mFavorite = " << file->metadata.get("favorite");
 			mFavorite.setValue(file->metadata.get("favorite"));
-			LOG(LogDebug) << "mKidGame = " << file->metadata.get("kidgame");
 			mKidGame.setValue(file->metadata.get("kidgame"));
-			LOG(LogDebug) << "mHidden = " << file->metadata.get("hidden");
 			mHidden.setValue(file->metadata.get("hidden"));
 		}
 		fadingOut = false;
