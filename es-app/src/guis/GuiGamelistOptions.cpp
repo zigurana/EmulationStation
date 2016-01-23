@@ -6,6 +6,8 @@
 #include "components/SwitchComponent.h"
 #include "guis/GuiSettings.h"
 #include "Log.h"
+#include "SystemData.h"
+#include "FileData.h"
 
 GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : GuiComponent(window), 
 	mSystem(system), 
@@ -40,6 +42,29 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	};
 	mMenu.addRow(row);
 
+	row.elements.clear();
+	mSurpriseModes = std::make_shared<SurpriseEnums>(mWindow, "SURPRISE ME!", false);
+	mSurpriseModes->add("ANY GAME", "ANY", true);
+	// todo:
+	//mSurpriseModes->add("LEAST PLAYED", "LEAST",false);
+	
+	
+	row.addElement(std::make_shared<TextComponent>(mWindow, "SURPRISE ME!", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
+	row.addElement(mSurpriseModes, false);
+	row.input_handler = [&](InputConfig* config, Input input) {
+		if(config->isMappedTo("a", input) && input.value)
+		{
+			SurpriseMe();
+			return true;
+		}
+		else if(mSurpriseModes->input(config, input))
+		{
+			return true;
+		}
+		return false;
+	};
+	mMenu.addRow(row);
+	
 	// sort list by
 	mListSort = std::make_shared<SortList>(mWindow, "SORT GAMES BY", false);
 	for(unsigned int i = 0; i < FileSorts::SortTypes.size(); i++)
@@ -175,4 +200,27 @@ void GuiGamelistOptions::save()
 		(*it)();
 
 	Settings::getInstance()->saveFile();
+}
+
+void GuiGamelistOptions::SurpriseMe()
+{
+	LOG(LogDebug) << "GuiGamelistOptions::SurpriseMe()";
+	bool filterHidden = true;
+	bool filterFav = false;
+	bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
+		
+	if (mSurpriseModes->getSelected() == "ANY")
+	{
+		LOG(LogDebug) << "   Picking a random game from a random system";
+		ViewController::get()->goToRandomGame(filterHidden, filterFav, filterKid);
+		delete this;
+	}
+	
+	if (mSurpriseModes->getSelected() == "LEAST")
+	{
+		LOG(LogDebug) << "   LEAST ANY: Not Implemented yet";
+	// select random system
+	// select random game
+	// launch
+	}					
 }

@@ -32,6 +32,7 @@ public:
 	void goToGameList(SystemData* system);
 	void goToSystemView(SystemData* system);
 	void goToStart();
+	void goToRandomGame(bool bhidden, bool bfav, bool bkid);
 
 	void onFileChanged(FileData* file, FileChangeType change);
 
