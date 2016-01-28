@@ -194,10 +194,7 @@ void GuiGamelistOptions::save()
 void GuiGamelistOptions::SurpriseMe()
 {
 	LOG(LogDebug) << "GuiGamelistOptions::SurpriseMe()";
-	bool filterHidden = true;
-	bool filterFav = false;
-	bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
-		
-	ViewController::get()->goToRandomGame(filterHidden, filterFav, filterKid);
+	bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");	
+	ViewController::get()->goToRandomGame(true, false, filterKid);
 	delete this;
 }
