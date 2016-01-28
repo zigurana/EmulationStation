@@ -212,7 +212,6 @@ void DetailedGameListView::updateInfoPanel()
 {
 	LOG(LogDebug) << "DetailedGameListView::UpdateInfoPanel()";
 	FileData* file = (mList.size() == 0 || mList.isScrolling()) ? NULL : mList.getSelected();
-	LOG(LogDebug) << "   1";
 	bool fadingOut;
 	if(file == NULL)
 	{
@@ -220,7 +219,6 @@ void DetailedGameListView::updateInfoPanel()
 		//mDescription.setText("");
 		fadingOut = true;
 	}else{
-		LOG(LogDebug) << "   2";
 		mImage.setImage(file->metadata.get("image"));
 		mDescription.setText(file->metadata.get("desc"));
 		mDescContainer.reset();
@@ -241,14 +239,12 @@ void DetailedGameListView::updateInfoPanel()
 		}
 		fadingOut = false;
 	}
-	LOG(LogDebug) << "   3";
 	std::vector<GuiComponent*> comps = getMDValues();
 	comps.push_back(&mImage);
 	comps.push_back(&mDescription);
 	
 	std::vector<TextComponent*> labels = getMDLabels();
 	comps.insert(comps.end(), labels.begin(), labels.end());
-	LOG(LogDebug) << "   4";
 	for(auto it = comps.begin(); it != comps.end(); it++)
 	{
 		GuiComponent* comp = *it;
@@ -266,7 +262,6 @@ void DetailedGameListView::updateInfoPanel()
 			comp->setAnimation(new LambdaAnimation(func, 150), 0, nullptr, fadingOut);
 		}
 	}
-	LOG(LogDebug) << "DetailedGameListView::UpdateInfoPanel(): done";
 }
 
 void DetailedGameListView::launch(FileData* game)

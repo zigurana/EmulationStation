@@ -132,7 +132,7 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 						
 						for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
 						{
-							LOG(LogDebug) << "System = " << (*it)->getName() << ", "<< (*it)->getGameCount(filterHidden, filterFav, filterKid) << " games found";
+							//LOG(LogDebug) << "System = " << (*it)->getName() << ", "<< (*it)->getGameCount(filterHidden, filterFav, filterKid) << " games found";
 							count += (*it)->getGameCount(filterHidden, filterFav, filterKid);
 						}
 						if (count == 0)

@@ -43,22 +43,11 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	mMenu.addRow(row);
 
 	row.elements.clear();
-	mSurpriseModes = std::make_shared<SurpriseEnums>(mWindow, "SURPRISE ME!", false);
-	mSurpriseModes->add("ANY GAME", "ANY", true);
-	// todo:
-	//mSurpriseModes->add("LEAST PLAYED", "LEAST",false);
-	
-	
 	row.addElement(std::make_shared<TextComponent>(mWindow, "SURPRISE ME!", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
-	row.addElement(mSurpriseModes, false);
 	row.input_handler = [&](InputConfig* config, Input input) {
 		if(config->isMappedTo("a", input) && input.value)
 		{
 			SurpriseMe();
-			return true;
-		}
-		else if(mSurpriseModes->input(config, input))
-		{
 			return true;
 		}
 		return false;
@@ -209,18 +198,6 @@ void GuiGamelistOptions::SurpriseMe()
 	bool filterFav = false;
 	bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
 		
-	if (mSurpriseModes->getSelected() == "ANY")
-	{
-		LOG(LogDebug) << "   Picking a random game from a random system";
-		ViewController::get()->goToRandomGame(filterHidden, filterFav, filterKid);
-		delete this;
-	}
-	
-	if (mSurpriseModes->getSelected() == "LEAST")
-	{
-		LOG(LogDebug) << "   LEAST ANY: Not Implemented yet";
-	// select random system
-	// select random game
-	// launch
-	}					
+	ViewController::get()->goToRandomGame(filterHidden, filterFav, filterKid);
+	delete this;
 }

@@ -40,7 +40,6 @@ void BasicGameListView::onFileChanged(FileData* file, FileChangeType change)
 
 void BasicGameListView::populateList(const std::vector<FileData*>& files)
 {
-	LOG(LogDebug) << "BasicGameListView::populateList()";
 	mList.clear();
 	mHeaderText.setText(files.at(0)->getSystem()->getFullName());
 	bool hasFavorites = false;
@@ -139,12 +138,10 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 			}
 		}
 	}
-	LOG(LogDebug) << "BasicGameListView::populateList(): done.";
 }
 
 FileData* BasicGameListView::getCursor()
 {
-	LOG(LogDebug) << "BasicGameListView::getCursor()";
 	return mList.getSelected();
 }
 

@@ -234,7 +234,6 @@ public:
 
 	T getSelected()
 	{
-		LOG(LogDebug) <<"OptionListCompoment::getSelected()";
 		assert(mMultiSelect == false);
 		auto selected = getSelectedObjects();
 		

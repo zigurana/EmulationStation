@@ -183,7 +183,7 @@ void GuiMetaDataEd::save()
 	{
 		if(mMetaDataDecl.at(i).isStatistic)
 			continue;
-		LOG(LogDebug) << i << ": Setting "<< mMetaDataDecl.at(i).key << " to be :" << mEditors.at(i)->getValue(); 
+		//LOG(LogDebug) << i << ": Setting "<< mMetaDataDecl.at(i).key << " to be :" << mEditors.at(i)->getValue(); 
 		mMetaData->set(mMetaDataDecl.at(i).key, mEditors.at(i)->getValue());
 	}
 	LOG(LogError) << "updating XML";
@@ -216,16 +216,16 @@ void GuiMetaDataEd::close(bool closeAllWindows)
 	// find out if the user made any changes
 	bool dirty = false;
 	LOG(LogDebug) << "GuiMetaDataEd::close()";
-	LOG(LogDebug) << " checking metadata fields (size = "<<mEditors.size()<<")for changes:";
+	//LOG(LogDebug) << " checking metadata fields (size = "<<mEditors.size()<<")for changes:";
 	for(unsigned int i = 0; i < mEditors.size(); i++)
 	{
 		const std::string& key = mMetaDataDecl.at(i).key;
 		if(mMetaData->get(key) != mEditors.at(i)->getValue())
 		{
-			LOG(LogDebug) << "mEditors.at("<<key<<") = "<<mEditors.at(i)->getValue();
-			LOG(LogDebug) << "mMetaData->get("<<key<<")= "<<mMetaData->get(key);
+			//LOG(LogDebug) << "mEditors.at("<<key<<") = "<<mEditors.at(i)->getValue();
+			//LOG(LogDebug) << "mMetaData->get("<<key<<")= "<<mMetaData->get(key);
 			dirty = true;
-			LOG(LogDebug) << "dirty!";
+			LOG(LogDebug) << "   dirty!";
 			break;
 		}
 	}
@@ -252,7 +252,7 @@ void GuiMetaDataEd::close(bool closeAllWindows)
 			"NO", closeFunc
 		));
 	}else{
-		LOG(LogDebug) << " no changes found, closing";
+		LOG(LogDebug) << "   no changes found, closing";
 		closeFunc();
 	}
 }
