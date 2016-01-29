@@ -63,7 +63,9 @@ public:
 		if(it == sSystemVector.rend()) it = sSystemVector.rbegin();
 		return *it;
 	}
-
+	
+	SystemData* getRandom(bool filterHidden, bool filterFav, bool filterKid) const;
+	
 	// Load or re-load theme.
 	void loadTheme();
 
