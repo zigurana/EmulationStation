@@ -82,8 +82,8 @@ const std::string& FileData::getThumbnailPath() const
 
 std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const
 {
-	//LOG(LogDebug) << "FileData::getFilesRecursive(filterhidden =" << filterHidden <<", filterFav = " << filterFav << ", filterKid = "<< filterKid << ")";
-	std::vector<FileData*> fileList;
+	//LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
+		std::vector<FileData*> fileList;
 
 	// first populate with all we can find
 	for(auto it = mChildren.begin(); it != mChildren.end(); it++)
@@ -98,7 +98,7 @@ std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool f
 		}
 	}
 		
-	// then filter all we do not want.
+	// then filter out all we do not want.
 	if(filterHidden)
 	{
 		fileList = filterFileData(fileList, "hidden", "false");
@@ -111,6 +111,7 @@ std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool f
 	{
 		fileList = filterFileData(fileList, "kidgame", "true");
 	}
+	//LOG(LogDebug) << "   Found " << fileList.size() << " games";
 	return fileList;
 }
 
@@ -174,4 +175,22 @@ void FileData::sort(ComparisonFunction& comparator, bool ascending)
 void FileData::sort(const SortType& type)
 {
 	sort(*type.comparisonFunction, type.ascending);
+}
+
+FileData* FileData::getRandom(bool filterHidden, bool filterFav, bool filterKid) const
+{
+	LOG(LogDebug) << "FileData::getRandom("<< filterHidden << ", " << filterFav << ", " << filterKid << ")";
+	
+	//Get list of files
+	std::vector<FileData*> list = getFilesRecursive(GAME,filterHidden, filterFav, filterKid);
+	const unsigned long n = list.size();
+    LOG(LogDebug) << "   found games: " << n;
+	
+	//Select random system
+	const unsigned long divisor = (RAND_MAX + 1) / n;
+    unsigned long k;
+    do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
+	
+	LOG(LogDebug) << "   Picked game: " << list.at(k)->getName();
+    return list.at(k);	
 }

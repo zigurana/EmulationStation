@@ -129,6 +129,21 @@ void ViewController::goToGameList(SystemData* system)
 	playViewTransition();
 }
 
+void ViewController::goToRandomGame(bool bhidden, bool bfav, bool bkid)
+{
+	LOG(LogDebug) << "ViewController::goToRandomGame(" << bhidden << bfav << bkid << ")";
+	
+	goToGameList(mState.system->getRandom(bhidden, bfav, bkid));
+	
+	FileData* selected = mState.system->getRootFolder()->getRandom(bhidden, bfav, bkid);
+	
+	IGameListView* view = getGameListView(mState.system).get();
+	view->setCursor(selected);
+
+	//mCurrentView.get()->setCursor(selected);
+	LOG(LogDebug) << "ViewController::goToRandomGame: done.";
+}
+
 void ViewController::updateFavorite(SystemData* system, FileData* file)
 {
 	IGameListView* view = getGameListView(system).get();

@@ -40,9 +40,7 @@ void BasicGameListView::onFileChanged(FileData* file, FileChangeType change)
 
 void BasicGameListView::populateList(const std::vector<FileData*>& files)
 {
-	LOG(LogDebug) << "BasicGameListView::populateList()";
 	mList.clear();
-	LOG(LogDebug) << "BasicGameListView::populateList():0";
 	mHeaderText.setText(files.at(0)->getSystem()->getFullName());
 	bool hasFavorites = false;
 	bool hasKidGames = false;

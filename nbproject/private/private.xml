@@ -12,9 +12,9 @@
         <group name="Group 20151103-09:57:27">
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputConfig.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/MetaData.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiMenu.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiMetaDataEd.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/BasicGameListView.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/Gamelist.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/ComponentList.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Settings.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/FileData.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/SystemView.cpp</file>
@@ -23,35 +23,36 @@
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/SystemData.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/ViewController.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputConfig.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/ISimpleGameListView.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/TextComponent.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/ThemeData.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/MetaData.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/ISimpleGameListView.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/ComponentGrid.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/EmulationStation.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiMenu.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/ThemeData.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/main.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/IList.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/guis/GuiMsgBox.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Settings.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiSettings.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/BasicGameListView.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/components/TextListComponent.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/TextComponent.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/SystemData.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/Window.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/OptionListComponent.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/DetailedGameListView.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/DetailedGameListView.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/guis/GuiInputConfig.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/components/RatingComponent.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/MenuComponent.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/IGameListView.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiGamelistOptions.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/InputManager.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/ScraperCmdLine.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiScraperStart.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/ImageComponent.cpp</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiGamelistOptions.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/components/ComponentList.h</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/guis/GuiGamelistOptions.cpp</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/FileData.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/SystemView.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/GuiComponent.cpp</file>
+            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/views/gamelist/IGameListView.h</file>
             <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-core/src/GuiComponent.h</file>
-            <file>file:/D:/Arcade-Project/RetroPieES/EmulationStation/es-app/src/PlatformId.h</file>
         </group>
     </open-files>
 </project-private>

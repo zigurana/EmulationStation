@@ -212,7 +212,6 @@ void DetailedGameListView::updateInfoPanel()
 {
 	LOG(LogDebug) << "DetailedGameListView::UpdateInfoPanel()";
 	FileData* file = (mList.size() == 0 || mList.isScrolling()) ? NULL : mList.getSelected();
-
 	bool fadingOut;
 	if(file == NULL)
 	{
@@ -240,14 +239,12 @@ void DetailedGameListView::updateInfoPanel()
 		}
 		fadingOut = false;
 	}
-
 	std::vector<GuiComponent*> comps = getMDValues();
 	comps.push_back(&mImage);
 	comps.push_back(&mDescription);
 	
 	std::vector<TextComponent*> labels = getMDLabels();
 	comps.insert(comps.end(), labels.begin(), labels.end());
-
 	for(auto it = comps.begin(); it != comps.end(); it++)
 	{
 		GuiComponent* comp = *it;
