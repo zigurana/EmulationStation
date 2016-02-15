@@ -497,16 +497,13 @@ SystemData* SystemData::getRandom(bool filterHidden, bool filterFav, bool filter
 			validSystems.push_back(*it);
 		}
 	}
-	
+
 	const unsigned long n = validSystems.size();
-    LOG(LogDebug) << "   Valid systems: " << n;
-	
+
 	//Select random system
 	const unsigned long divisor = (RAND_MAX + 1) / n;
-    unsigned long k;
-    do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
-	
-	LOG(LogDebug) << "   Picked system: " << validSystems.at(k)->getFullName();
-    
+	unsigned long k;
+	do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
+
 	return validSystems.at(k);
 }

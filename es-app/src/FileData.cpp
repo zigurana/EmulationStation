@@ -83,7 +83,7 @@ const std::string& FileData::getThumbnailPath() const
 std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const
 {
 	//LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
-		std::vector<FileData*> fileList;
+	std::vector<FileData*> fileList;
 
 	// first populate with all we can find
 	for(auto it = mChildren.begin(); it != mChildren.end(); it++)
@@ -184,13 +184,11 @@ FileData* FileData::getRandom(bool filterHidden, bool filterFav, bool filterKid)
 	//Get list of files
 	std::vector<FileData*> list = getFilesRecursive(GAME,filterHidden, filterFav, filterKid);
 	const unsigned long n = list.size();
-    LOG(LogDebug) << "   found games: " << n;
 	
 	//Select random system
 	const unsigned long divisor = (RAND_MAX + 1) / n;
-    unsigned long k;
-    do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
-	
-	LOG(LogDebug) << "   Picked game: " << list.at(k)->getName();
-    return list.at(k);	
+	unsigned long k;
+	do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
+
+	return list.at(k);
 }
