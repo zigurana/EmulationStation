@@ -184,13 +184,13 @@ FileData* FileData::getRandom(bool filterHidden, bool filterFav, bool filterKid)
 	//Get list of files
 	std::vector<FileData*> list = getFilesRecursive(GAME,filterHidden, filterFav, filterKid);
 	const unsigned long n = list.size();
-    LOG(LogDebug) << "   found games: " << n;
+	LOG(LogDebug) << "   found games: " << n;
 	
 	//Select random system
 	const unsigned long divisor = (RAND_MAX + 1) / n;
-    unsigned long k;
-    do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
+	unsigned long k;
+	do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
 	
 	LOG(LogDebug) << "   Picked game: " << list.at(k)->getName();
-    return list.at(k);	
+	return list.at(k);	
 }
