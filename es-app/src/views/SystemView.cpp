@@ -145,7 +145,16 @@ bool SystemView::input(InputConfig* config, Input input)
 		if(config->isMappedTo("a", input))
 		{
 			stopScrolling();
-			ViewController::get()->goToGameList(getSelected());
+			
+			SystemData *systemData = getSelected();
+			
+			// decide whether to show game list or launch the command directly
+			if ( !systemData->getDirectLaunch() )
+			{
+				ViewController::get()->goToGameList(getSelected());
+			}else{
+				systemData->launchGame( mWindow, nullptr );
+			}
 			return true;
 		}
 	}else{
@@ -208,12 +217,6 @@ void SystemView::onCursorChanged(const CursorState& state)
 
 		// only display a game count if there are at least 2 games - Full / Kiosk UI modes
 		LOG(LogDebug) << "System selected = " << getSelected()->getName() << ", UIMode = "<< Settings::getInstance()->getString("UIMode");
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, false, false) = " << getSelected()->getGameCount(false, false, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(true, false, false) = " << getSelected()->getGameCount(true, false, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, true, false) = " << getSelected()->getGameCount(false, true, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, false, true) = " << getSelected()->getGameCount(false, false, true);
-		//LOG(LogDebug) << "getSelected()->getGameCount(true, true, false) = " << getSelected()->getGameCount(true, true, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, true, true) = " << getSelected()->getGameCount(false, true, true);
 
 		if(Settings::getInstance()->getString("UIMode") == "Full")
 		{
