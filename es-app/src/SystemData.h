@@ -12,7 +12,7 @@ class SystemData
 {
 public:
 	SystemData(const std::string& name, const std::string& fullName, const std::string& startPath, const std::vector<std::string>& extensions, 
-		const std::string& command, const std::vector<PlatformIds::PlatformId>& platformIds, const std::string& themeFolder);
+		const std::string& command, const std::vector<PlatformIds::PlatformId>& platformIds, const std::string& themeFolder, bool directLaunch=false);
 	~SystemData();
 
 	inline FileData* getRootFolder() const { return mRootFolder; };
@@ -23,6 +23,7 @@ public:
 	inline const std::string& getThemeFolder() const { return mThemeFolder; }
 	inline bool getHasFavorites() const { return mHasFavorites; }	
 	inline bool getHasKidGames() const { return mHasKidGames; }
+	inline const bool getDirectLaunch() const { return mDirectLaunch; }
 
 
 	inline const std::vector<PlatformIds::PlatformId>& getPlatformIds() const { return mPlatformIds; }
@@ -78,6 +79,7 @@ private:
 	std::vector<PlatformIds::PlatformId> mPlatformIds;
 	std::string mThemeFolder;
 	std::shared_ptr<ThemeData> mTheme;
+	bool mDirectLaunch;
 
 	bool mHasFavorites;
 	bool mHasKidGames;
