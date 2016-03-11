@@ -80,7 +80,7 @@ void ViewController::goToNextGameList(bool bhidden, bool bfav, bool bkid)
 	do
 	{
 		system = system->getNext();
-	} while ( system->getDirectLaunch()->getGameCount(bhidden, bfav, bkid) == 0 );
+	} while ( system->getDirectLaunch() || system->getGameCount(bhidden, bfav, bkid) == 0 );
 	
 	goToGameList(system);
 }
@@ -96,7 +96,7 @@ void ViewController::goToPrevGameList(bool bhidden, bool bfav, bool bkid)
 	do
 	{
 		system = system->getPrev();
-	} while ( system->getDirectLaunch()->getGameCount(bhidden, bfav, bkid) == 0 );
+	} while ( system->getDirectLaunch() || system->getGameCount(bhidden, bfav, bkid) == 0 );
 	
 	goToGameList(system);
 }
