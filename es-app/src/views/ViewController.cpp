@@ -80,7 +80,7 @@ void ViewController::goToNextGameList(bool bhidden, bool bfav, bool bkid)
 	do
 	{
 		system = system->getNext();
-	} while ( system->getDirectLaunch() || system->getGameCount(bhidden, bfav, bkid) == 0 );
+	} while ( system->getGameCount(bhidden, bfav, bkid) == 0 );
 	
 	goToGameList(system);
 }
@@ -90,13 +90,12 @@ void ViewController::goToPrevGameList(bool bhidden, bool bfav, bool bkid)
 	assert(mState.viewing == GAME_LIST);
 	SystemData* system = getState().getSystem();
 	assert(system);
-
 	// skip systems that don't have a game list, this will always end since it is called
 	// from a system with a game list and the iterator is cyclic
 	do
 	{
 		system = system->getPrev();
-	} while ( system->getDirectLaunch() || system->getGameCount(bhidden, bfav, bkid) == 0 );
+	} while ( system->getGameCount(bhidden, bfav, bkid) == 0 );
 	
 	goToGameList(system);
 }
