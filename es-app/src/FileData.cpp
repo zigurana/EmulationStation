@@ -192,7 +192,8 @@ FileData* FileData::getRandom(bool filterHidden, bool filterFav, bool filterKid)
 	LOG(LogDebug) << "   found games: " << n;
 	
 	//Select random system
-	const unsigned long divisor = (RAND_MAX + 1) / n;
+	//const unsigned long divisor = (RAND_MAX + 1) / n;
+	const unsigned long divisor = (RAND_MAX) / n; // the above is correct, but gives compiler warning.
 	unsigned long k;
 	do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
 	

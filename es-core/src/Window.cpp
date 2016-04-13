@@ -7,6 +7,7 @@
 #include <iomanip>
 #include "components/HelpComponent.h"
 #include "components/ImageComponent.h"
+#include "platform.h"
 
 
 Window::Window() : mNormalizeNextUpdate(false), mFrameTimeElapsed(0), mFrameCountElapsed(0), mAverageDeltaTime(10), 
@@ -397,12 +398,8 @@ void Window::ListenForPassKeySequence(InputConfig* config, Input input)
 		if(Settings::getInstance()->getString("UIMode") == "Full")
 			break;
 		}
-		SDL_Event ev;
-		ev.type = SDL_QUIT;
-		SDL_PushEvent(&ev);
-				
-		// TODO something to trigger screen reload, look at 
-		//ViewController::get()->reloadAll();
+		if(quitES("/tmp/es-restart") != 0)
+			LOG(LogWarning) << "Restart terminated with non-zero result!";
 
 	}
 }

@@ -68,7 +68,7 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
 	favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
 	mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
-	addSaveFunc([favorite_only] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); });
+	addSaveFunc([favorite_only, this] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); mFavoriteStateChanged = true; });
 	
 	// edit game metadata - only in Full UI mode
 	if(Settings::getInstance()->getString("UIMode") == "Full")
@@ -83,8 +83,8 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	// center the menu
 	setSize((float)Renderer::getScreenWidth(), (float)Renderer::getScreenHeight());
 	mMenu.setPosition((mSize.x() - mMenu.getSize().x()) / 2, (mSize.y() - mMenu.getSize().y()) / 2);
-
-	mFavoriteState = Settings::getInstance()->getBool("FavoritesOnly");
+	
+	
 }
 
 GuiGamelistOptions::~GuiGamelistOptions()
@@ -97,9 +97,9 @@ GuiGamelistOptions::~GuiGamelistOptions()
 	// notify that the root folder was sorted
 	
 	getGamelist()->onFileChanged(root, FILE_SORTED);				
-	if (Settings::getInstance()->getBool("FavoritesOnly") != mFavoriteState)
+	if (mFavoriteStateChanged)
 	{
-		LOG(LogDebug) << "  GUIGamelistOptions::~GuiGamelistOptions(): reloading GameList";
+		LOG(LogDebug) << "  GUIGamelistOptions::~GuiGamelistOptions(): FavoriteStateChanged, reloading GameList";
 		ViewController::get()->setAllInvalidGamesList(getGamelist()->getCursor()->getSystem());
 		ViewController::get()->reloadGameListView(getGamelist()->getCursor()->getSystem());
 	}

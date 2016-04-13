@@ -35,7 +35,7 @@ private:
 	std::shared_ptr<SortList> mListSort;
 
 	std::shared_ptr<SwitchComponent> mFavoriteOption;
-	bool mFavoriteState;
+	bool mFavoriteStateChanged;
 
 	typedef OptionListComponent<std::string> SurpriseEnums;
 	std::shared_ptr<SurpriseEnums> mSurpriseModes;
