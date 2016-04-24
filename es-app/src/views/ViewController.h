@@ -36,7 +36,8 @@ public:
 
 	void onFileChanged(FileData* file, FileChangeType change);
 
-	void updateGameList(SystemData* system, FileData* file);
+	void updateFavorite(SystemData* system, FileData* file);
+	void updateKidGame(SystemData* system, FileData* file);
 	
 	// Plays a nice launch effect and launches the game at the end of it.
 	// Once the game terminates, plays a return effect.

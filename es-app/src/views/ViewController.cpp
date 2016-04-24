@@ -115,8 +115,9 @@ void ViewController::goToGameList(SystemData* system)
 
 	if (mInvalidGameList[system] == true)
 	{
-		updateGameList(system, getGameListView(system).get()->getCursor());
-			
+		updateFavorite(system, getGameListView(system).get()->getCursor());
+		updateKidGame(system, getGameListView(system).get()->getCursor());
+		
 		if ((mFavoritesOnly != Settings::getInstance()->getBool("FavoritesOnly")) ||
 			(mKidGamesOnly != (Settings::getInstance()->getString("UIMode") == "Kid")))
 		{
@@ -148,26 +149,98 @@ void ViewController::goToRandomGame(bool bhidden, bool bfav, bool bkid)
 	//mCurrentView.get()->setCursor(selected);
 	LOG(LogDebug) << "ViewController::goToRandomGame: done.";
 }
-void ViewController::updateGameList(SystemData* system, FileData* file)
+
+void ViewController::updateFavorite(SystemData* system, FileData* file)
 {
-	LOG(LogDebug) << "ViewController::updateGameList()";
-	
 	IGameListView* view = getGameListView(system).get();
-	
-	bool filterFav = Settings::getInstance()->getBool("FavoritesOnly");
-	bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
-	bool filterHidden = (Settings::getInstance()->getString("UIMode") == "Kiosk");
+	if (Settings::getInstance()->getBool("FavoritesOnly"))
+	{
+		const std::vector<FileData*>& files = system->getRootFolder()->getChildren();
+		view->populateList(files);
+		int pos = std::find(files.begin(), files.end(), file) - files.begin();
+		bool found = false;
+		for (auto it = files.begin() + pos; it != files.end(); it++)
+		{
+			if ((*it)->getType() == GAME)
+			{
+				if ((*it)->metadata.get("favorite").compare("true") == 0)
+				{
+					view->setCursor(*it);
+					found = true;
+					break;
+				}
+			}
+		}
 
-	const std::vector<FileData*>& files = system->getRootFolder()->getFilesRecursive(GAME | FOLDER, filterHidden, filterFav, filterKid);
+		if (!found)
+		{
+			for (auto it = files.begin() + pos; it != files.begin(); it--)
+			{
+				if ((*it)->getType() == GAME)
+				{
+					if ((*it)->metadata.get("favorite").compare("true") == 0)
+					{
+						view->setCursor(*it);
+						break;
+					}
+				}
+			}
+		}
 
-	if(files.size()> 0){
-		view->populateList(files); // This does a double check, is not necessary if the list of files is already filtered!!
-		// TODO: clean up call to view->populateList with filtered files[]!
-		view->updateInfoPanel();
-	}else{
-		LOG(LogDebug) << "  No suitable items found to list, not updating.";
+		if (!found)
+		{
+			view->setCursor(*(files.begin() + pos));
+		}
 	}
+
+	view->updateInfoPanel();
 }
+void ViewController::updateKidGame(SystemData* system, FileData* file)
+{
+	IGameListView* view = getGameListView(system).get();
+	if (Settings::getInstance()->getString("UIMode") == "Kid")
+	{
+		const std::vector<FileData*>& files = system->getRootFolder()->getChildren();
+		view->populateList(files);
+		int pos = std::find(files.begin(), files.end(), file) - files.begin();
+		bool found = false;
+		for (auto it = files.begin() + pos; it != files.end(); it++)
+		{
+			if ((*it)->getType() == GAME)
+			{
+				if ((*it)->metadata.get("kidgame").compare("true") == 0)
+				{
+					view->setCursor(*it);
+					found = true;
+					break;
+				}
+			}
+		}
+
+		if (!found)
+		{
+			for (auto it = files.begin() + pos; it != files.begin(); it--)
+			{
+				if ((*it)->getType() == GAME)
+				{
+					if ((*it)->metadata.get("kidgame").compare("true") == 0)
+					{
+						view->setCursor(*it);
+						break;
+					}
+				}
+			}
+		}
+
+		if (!found)
+		{
+			view->setCursor(*(files.begin() + pos));
+		}
+	}
+
+	view->updateInfoPanel();
+}
+
 void ViewController::playViewTransition()
 {
 	Eigen::Vector3f target(Eigen::Vector3f::Identity());
