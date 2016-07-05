@@ -11,7 +11,7 @@
 BasicGameListView::BasicGameListView(Window* window, FileData* root)
 	: ISimpleGameListView(window, root), mList(window)
 {
-	LOG(LogDebug) << "BasicGameListView::BasicGameListView()";
+	//LOG(LogDebug) << "BasicGameListView::BasicGameListView()";
 	mList.setSize(mSize.x(), mSize.y() * 0.8f);
 	mList.setPosition(0, mSize.y() * 0.2f);
 	addChild(&mList);
@@ -79,10 +79,10 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 	if (Settings::getInstance()->getString("UIMode") == "Kiosk")
 		UIMode_int = 2;
 	
-	LOG(LogDebug)<< "BasicGameListView::populateList(): UIMode_int = " << UIMode_int;
-	LOG(LogDebug)<< "BasicGameListView::populateList(): filterFav = "<< filterFav;
-	LOG(LogDebug)<< "BasicGameListView::populateList(): hasKidGames = "<< hasKidGames;
-	LOG(LogDebug)<< "BasicGameListView::populateList(): nr of items in list = "<< files.size();
+	//LOG(LogDebug)<< "BasicGameListView::populateList(): UIMode_int = " << UIMode_int;
+	//LOG(LogDebug)<< "BasicGameListView::populateList(): filterFav = "<< filterFav;
+	//LOG(LogDebug)<< "BasicGameListView::populateList(): hasKidGames = "<< hasKidGames;
+	//LOG(LogDebug)<< "BasicGameListView::populateList(): nr of items in list = "<< files.size();
 	// loop over all files and populate depending on UIMode	
 	int cnt = 0;
 	for(auto it = files.begin(); it != files.end(); it++)
@@ -148,10 +148,10 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 		{
 			mList.add((*it)->getName(), *it, 1);
 			cnt++;
-			LOG(LogDebug)<< "BasicGameListView::populateList(): Adding folder: " << (*it)->getName();
+			//LOG(LogDebug)<< "BasicGameListView::populateList(): Adding folder: " << (*it)->getName();
 		}
 	}
-	LOG(LogDebug)<< "BasicGameListView::populateList(): added " << cnt << " items. END";
+	//LOG(LogDebug)<< "BasicGameListView::populateList(): added " << cnt << " items. END";
 }
 
 FileData* BasicGameListView::getCursor()

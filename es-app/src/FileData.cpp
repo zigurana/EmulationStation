@@ -87,7 +87,7 @@ const std::string& FileData::getThumbnailPath() const
 
 std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const
 {
-	LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
+	//LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
 		std::vector<FileData*> fileList;
 
 	// first populate with all we can find
@@ -98,7 +98,7 @@ std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool f
 		
 		if((*it)->getChildren().size() > 0)
 		{
-			LOG(LogDebug) << "FileData::getFilesRecursive(): Recursing!";
+			//LOG(LogDebug) << "FileData::getFilesRecursive(): Recursing!";
 			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask, filterHidden, filterFav, filterKid);
 			fileList.insert(fileList.end(), subchildren.cbegin(), subchildren.cend());
 		}

@@ -207,7 +207,7 @@ void SystemView::onCursorChanged(const CursorState& state)
 		std::stringstream ss;
 
 		// only display a game count if there are at least 2 games - Full / Kiosk UI modes
-		LOG(LogDebug) << "System selected = " << getSelected()->getName() << ", UIMode = "<< Settings::getInstance()->getString("UIMode");
+		//LOG(LogDebug) << "System selected = " << getSelected()->getName() << ", UIMode = "<< Settings::getInstance()->getString("UIMode");
 		//LOG(LogDebug) << "getSelected()->getGameCount(false, false, false) = " << getSelected()->getGameCount(false, false, false);
 		//LOG(LogDebug) << "getSelected()->getGameCount(true, false, false) = " << getSelected()->getGameCount(true, false, false);
 		//LOG(LogDebug) << "getSelected()->getGameCount(false, true, false) = " << getSelected()->getGameCount(false, true, false);
