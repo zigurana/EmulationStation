@@ -68,7 +68,35 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
 	favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
 	mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
-	addSaveFunc([favorite_only, this] { Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState()); mFavoriteStateChanged = true; });
+	addSaveFunc([favorite_only, this] {
+		if(favorite_only->getState())
+		{
+			bool filterHidden = ((Settings::getInstance()->getString("UIMode") == "Kiosk") ||
+								 (Settings::getInstance()->getString("UIMode") == "Kid"));
+			bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
+			bool hasFavorite = false;
+			
+			// check if there is anything at all to show, otherwise revert
+			for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
+			{
+				if( (*it)->getGameCount(filterHidden, favorite_only->getState(), filterKid) > 0 )
+				{
+					hasFavorite = true;
+					break;
+				}
+			}
+			if(!hasFavorite)
+			{
+				LOG(LogDebug) << "Nothing to show in selected favorites mode, resetting";
+				favorite_only->setState(false);			
+			}
+		}
+		if(favorite_only->getState() != Settings::getInstance()->getBool("FavoritesOnly"))
+		{
+			Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState());
+			mFavoriteStateChanged = true;
+		}
+	});
 	
 	// edit game metadata - only in Full UI mode
 	if(Settings::getInstance()->getString("UIMode") == "Full")
@@ -99,7 +127,8 @@ GuiGamelistOptions::~GuiGamelistOptions()
 	{
 		LOG(LogDebug) << "  GUIGamelistOptions::~GuiGamelistOptions(): FavoriteStateChanged, reloading GameList";
 		ViewController::get()->setAllInvalidGamesList(getGamelist()->getCursor()->getSystem());
-		ViewController::get()->reloadGameListView(getGamelist()->getCursor()->getSystem());
+		//ViewController::get()->reloadGameListView(getGamelist()->getCursor()->getSystem());
+		ViewController::get()->reloadAll();
 	}
 }
 

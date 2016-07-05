@@ -87,7 +87,7 @@ const std::string& FileData::getThumbnailPath() const
 
 std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const
 {
-	//LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
+	LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
 		std::vector<FileData*> fileList;
 
 	// first populate with all we can find
@@ -98,6 +98,7 @@ std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool f
 		
 		if((*it)->getChildren().size() > 0)
 		{
+			LOG(LogDebug) << "FileData::getFilesRecursive(): Recursing!";
 			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask, filterHidden, filterFav, filterKid);
 			fileList.insert(fileList.end(), subchildren.cbegin(), subchildren.cend());
 		}
@@ -126,10 +127,15 @@ std::vector<FileData*> FileData::filterFileData(std::vector<FileData*> in, std::
 
 	for (auto it = in.begin(); it != in.end(); it++)
 	{
-		//LOG(LogDebug) << (*it)->getName() << ":" <<  filtername << " = " << (*it)->metadata.get(filtername);
-		if ((*it)->metadata.get(filtername).compare(passString) == 0)
+		if((*it)->getType() == FOLDER)
 		{
-			out.push_back(*it);
+			out.push_back(*it); // for now just include all subfolders, even though they might be empty.
+		}else
+		{
+			if ((*it)->metadata.get(filtername).compare(passString) == 0)
+			{
+				out.push_back(*it);
+			}
 		}
 	}
 
