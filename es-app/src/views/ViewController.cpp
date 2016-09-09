@@ -69,7 +69,7 @@ void ViewController::goToSystemView(SystemData* system)
 	playViewTransition();
 }
 
-void ViewController::goToNextGameList(bool bhidden, bool bfav, bool bkid)
+void ViewController::goToNextGameList()
 {
 	assert(mState.viewing == GAME_LIST);
 	SystemData* system = getState().getSystem();
@@ -77,25 +77,23 @@ void ViewController::goToNextGameList(bool bhidden, bool bfav, bool bkid)
 
 	// skip systems that don't have a game list, this will always end since it is called
 	// from a system with a game list and the iterator is cyclic
-	do
-	{
+	do {
 		system = system->getNext();
-	} while ( system->getGameCount(bhidden, bfav, bkid) == 0 );
+	} while ( system->getGameCount(true) == 0 );
 	
 	goToGameList(system);
 }
 
-void ViewController::goToPrevGameList(bool bhidden, bool bfav, bool bkid)
+void ViewController::goToPrevGameList()
 {
 	assert(mState.viewing == GAME_LIST);
 	SystemData* system = getState().getSystem();
 	assert(system);
 	// skip systems that don't have a game list, this will always end since it is called
 	// from a system with a game list and the iterator is cyclic
-	do
-	{
+	do {
 		system = system->getPrev();
-	} while ( system->getGameCount(bhidden, bfav, bkid) == 0 );
+	} while ( system->getGameCount(true) == 0 );
 	
 	goToGameList(system);
 }
@@ -135,13 +133,13 @@ void ViewController::goToGameList(SystemData* system)
 	playViewTransition();
 }
 
-void ViewController::goToRandomGame(bool bhidden, bool bfav, bool bkid)
+void ViewController::goToRandomGame()
 {
-	LOG(LogDebug) << "ViewController::goToRandomGame(" << bhidden << bfav << bkid << ")";
+	LOG(LogDebug) << "ViewController::goToRandomGame()";
 	
-	goToGameList(mState.system->getRandom(bhidden, bfav, bkid));
+	goToGameList(mState.system->getRandom());
 	
-	FileData* selected = mState.system->getRootFolder()->getRandom(bhidden, bfav, bkid);
+	FileData* selected = mState.system->getRootFolder()->getRandom();
 	
 	IGameListView* view = getGameListView(mState.system).get();
 	view->setCursor(selected);
@@ -347,8 +345,8 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 	std::shared_ptr<IGameListView> view;
 
 	//decide type
+	std::vector<FileData*> files = system->getRootFolder()->getFilesRecursive(GAME | FOLDER, false);
 	bool detailed = false;
-	std::vector<FileData*> files = system->getRootFolder()->getFilesRecursive(GAME | FOLDER, false, false, false);
 	if (files.size() > 0)
 	{
 		for(auto it = files.begin(); it != files.end(); it++)

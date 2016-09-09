@@ -35,7 +35,7 @@ public:
 	bool hasGamelist() const;
 	std::string getThemePath() const;
 	
-	unsigned int getGameCount(bool filterHidden, bool filterFav, bool filterKid) const;
+	unsigned int getGameCount(bool filter) const;
 	
 	void launchGame(Window* window, FileData* game);
 
@@ -65,7 +65,7 @@ public:
 		return *it;
 	}
 	
-	SystemData* getRandom(bool filterHidden, bool filterFav, bool filterKid) const;
+	SystemData* getRandom() const;
 	
 	// Load or re-load theme.
 	void loadTheme();

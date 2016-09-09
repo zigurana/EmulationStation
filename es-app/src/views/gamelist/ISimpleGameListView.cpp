@@ -25,10 +25,6 @@ mHeaderText(window), mHeaderImage(window), mBackground(window), mThemeExtras(win
 	addChild(&mHeaderText);
 	addChild(&mBackground);
 	addChild(&mThemeExtras);
-	mFilterHidden = ((Settings::getInstance()->getString("UIMode") == "Kiosk") ||
-						  (Settings::getInstance()->getString("UIMode") == "Kid"));
-	mFilterFav = Settings::getInstance()->getBool("FavoritesOnly");
-	mFilterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
 }
 
 void ISimpleGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
@@ -128,19 +124,17 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 		{
 			LOG(LogDebug) << "ISimpleGameListView::input(): y detected!";
 			FileData* cursor = getCursor();
-			if (cursor->getSystem()->getHasKidGames() && !mFilterHidden) // only when kidgames are supported by system+theme, and when in UImode=full
-			{
-				if (cursor->getType() == GAME)
-				{
+			if (cursor->getSystem()->getHasKidGames() && 
+				Settings::getInstance()->getString("UIMode") == "Full") 
+			{ // only when kidgames are supported by system+theme, and when in full UImode
+				if (cursor->getType() == GAME) {
 					mKidGameChange = true;
 					MetaDataList* md = &cursor->metadata;
 					std::string value = md->get("kidgame");
 					LOG(LogDebug) << "kidgame = "<< value;
-					if (value.compare("false") == 0)
-					{
+					if (value.compare("false") == 0) {
 						md->set("kidgame", "true");
-					}					else
-					{
+					}					else {
 						md->set("kidgame", "false");
 					}
 					LOG(LogDebug) << "New kidgame value set to: "<< md->get("kidgame");
@@ -158,7 +152,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					mFavoriteChange = false;
 					mKidGameChange = false;
 				}
-				ViewController::get()->goToNextGameList(mFilterHidden, mFilterFav, mFilterKid);
+				ViewController::get()->goToNextGameList();
 				return true;
 			}
 		}else if(config->isMappedTo("left", input))
@@ -172,7 +166,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 					mFavoriteChange = false;
 					mKidGameChange = false;
 				}
-				ViewController::get()->goToPrevGameList(mFilterHidden, mFilterFav, mFilterKid);
+				ViewController::get()->goToPrevGameList();
 				return true;
 			}
 		}

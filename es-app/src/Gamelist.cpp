@@ -205,7 +205,7 @@ void updateGamelist(SystemData* system)
 	if (rootFolder != nullptr)
 	{
 		//get only files, no folders
-		std::vector<FileData*> files = rootFolder->getFilesRecursive(GAME | FOLDER, false, false, false);
+		std::vector<FileData*> files = rootFolder->getFilesRecursive(GAME | FOLDER, false);
 		//iterate through all files, checking if they're already in the XML
 		if(files.size() > 0)
 		{

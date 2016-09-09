@@ -16,7 +16,7 @@ BasicGameListView::BasicGameListView(Window* window, FileData* root)
 	mList.setPosition(0, mSize.y() * 0.2f);
 	addChild(&mList);
 
-	populateList(root->getChildren());
+	populateList(root->getChildren(true));  // This returns a filtered list based on UImode
 }
 
 void BasicGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
@@ -40,118 +40,27 @@ void BasicGameListView::onFileChanged(FileData* file, FileChangeType change)
 
 void BasicGameListView::populateList(const std::vector<FileData*>& files)
 {
-	LOG(LogDebug)<< "BasicGameListView::populateList(): system = " << files.at(0)->getSystem()->getFullName();
+	if (files.size() > 0) {
+		LOG(LogDebug) << "BasicGameListView::populateList(): system = " << files.at(0)->getSystem()->getFullName();
+	}
 	mList.clear();
+	// TODO: how to handle empty lists??
 
+	// file list can be empty if direct launch item
+	if (files.size()==0) {
+		return;
+	}
+	
 	mHeaderText.setText(files.at(0)->getSystem()->getFullName());
-
-	bool filterFav = false;
-	bool hasKidGames = false;
-	
-	if (Settings::getInstance()->getBool("FavoritesOnly"))
-	{
-		for (auto it = files.begin(); it != files.end(); it++)
-		{
-			if ( ((*it)->getType() == GAME) && ((*it)->metadata.get("favorite").compare("true") == 0) )
-			{
-				filterFav = true;
-				break;
-			}
-		}
-	}
-	if (Settings::getInstance()->getString("UIMode") == "Kid")
-	{
-		for (auto it = files.begin(); it != files.end(); it++)
-		{
-			if ( ((*it)->getType() == GAME) && ((*it)->metadata.get("kidgame").compare("true") == 0) )
-			{
-				hasKidGames = true;
-				break;
-			}
-		}
-	}
-	
-	// Read in UIMode, store in an int for ease of switching.
-	// Default behavior is mode = full (showing everything)
-	int UIMode_int = 0;
-	if ( (Settings::getInstance()->getString("UIMode") == "Kid") && hasKidGames )
-		UIMode_int = 1;
-	if (Settings::getInstance()->getString("UIMode") == "Kiosk")
-		UIMode_int = 2;
-	
-	//LOG(LogDebug)<< "BasicGameListView::populateList(): UIMode_int = " << UIMode_int;
-	//LOG(LogDebug)<< "BasicGameListView::populateList(): filterFav = "<< filterFav;
-	//LOG(LogDebug)<< "BasicGameListView::populateList(): hasKidGames = "<< hasKidGames;
-	//LOG(LogDebug)<< "BasicGameListView::populateList(): nr of items in list = "<< files.size();
-	// loop over all files and populate depending on UIMode	
-	int cnt = 0;
-	for(auto it = files.begin(); it != files.end(); it++)
-	{
+	for (auto it = files.begin(); it != files.end(); it++) {
 		if ((*it)->getType() == GAME)
 		{
-			switch (UIMode_int)
-			{
-				case 2: // Kiosk mode: Filter hidden items
-					if (filterFav)
-					{
-						if(((*it)->metadata.get("favorite").compare("true") == 0) &&
-						   ((*it)->metadata.get("hidden").compare("false") == 0))
-						{
 							mList.add((*it)->getName(), *it, 0);
-							cnt++;
-						}
-					}else 
-					{
-						if((*it)->metadata.get("hidden").compare("false") == 0)
-						{
-							mList.add((*it)->getName(), *it, 0);
-							cnt++;
-						}
-					}	
-					break;
-				case 1: // Kid mode: Filter all items non kid-game
-					if (filterFav)
-					{
-						if(((*it)->metadata.get("favorite").compare("true") == 0) &&
-						   ((*it)->metadata.get("hidden").compare("false") == 0) &&
-						   ((*it)->metadata.get("kidgame").compare("true") == 0))
-						{
-							mList.add((*it)->getName(), *it, 0);
-							cnt++;
-						}
-					}else 
-					{
-						if(((*it)->metadata.get("hidden").compare("false") == 0) &&
-						   ((*it)->metadata.get("kidgame").compare("true") == 0))
-						{
-							mList.add((*it)->getName(), *it, 0);
-							cnt++;
-						}
-					}
-					break;
-				case 0: // Full mode: show all
-					if (filterFav)
-					{
-						if((*it)->metadata.get("favorite").compare("true") == 0)
-						{
-							mList.add((*it)->getName(), *it, 0);
-							cnt++;
-						}
-					}else 
-					{
-						mList.add((*it)->getName(), *it, 0);
-						cnt++;
-					}
-					break;
-			}
-		}else // its a folder!
-		{
+		} else { // its a folder!
 			mList.add((*it)->getName(), *it, 1);
-			cnt++;
-			//LOG(LogDebug)<< "BasicGameListView::populateList(): Adding folder: " << (*it)->getName();
 		}
 	}
-	//LOG(LogDebug)<< "BasicGameListView::populateList(): added " << cnt << " items. END";
+	LOG(LogDebug)<< "BasicGameListView::populateList(): added " << mList.size() << " items. END";
 }
 
 FileData* BasicGameListView::getCursor()

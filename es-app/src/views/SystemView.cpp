@@ -31,33 +31,16 @@ SystemView::SystemView(Window* window) : IList<SystemViewData, SystemData*>(wind
 void SystemView::populate()
 {
 	LOG(LogDebug) << "SystemView::populate()";
-	bool filterHidden = false;
-	bool filterKid = false;
-	if (Settings::getInstance()->getString("UIMode") != "Full")
-	{
-		filterHidden = true;
-	}
-	if (Settings::getInstance()->getString("UIMode") == "Kid")
-	{
-		filterKid = true;
-	}
-	
-	bool filterFav = Settings::getInstance()->getBool("FavoritesOnly");
-
 	LOG(LogDebug) << "    Settings.UIMode  = " << Settings::getInstance()->getString("UIMode");
 	LOG(LogDebug) << "    Settings.FavoritesOnly  = " << Settings::getInstance()->getBool("FavoritesOnly");
-	LOG(LogDebug) << "    filterHidden = " << filterHidden;
-	LOG(LogDebug) << "    filterFav = " << filterFav;
-	LOG(LogDebug) << "    filterKid = " << filterKid;
 	
 	mEntries.clear();
 	for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
 	{
 		LOG(LogDebug) << "    System = " << (*it)->getName();
 		
-		if ((*it)->getGameCount(filterHidden, filterFav, filterKid) > 0)
-		{
-			LOG(LogDebug) << (*it)->getGameCount(filterHidden, filterFav, filterKid) << " games found, populating.";
+		if ((*it)->getGameCount(true) > 0) {
+			LOG(LogDebug) << (*it)->getGameCount(true) << " games found, populating.";
 			
 			const std::shared_ptr<ThemeData>& theme = (*it)->getTheme();
 
@@ -197,106 +180,15 @@ void SystemView::onCursorChanged(const CursorState& state)
 		mSystemInfo.setOpacity((unsigned char)(lerp<float>(infoStartOpacity, 0.f, t) * 255));
 	}, (int)(infoStartOpacity * 150));
 
-
-	/*unsigned int favoritesCount = getSelected()->getGameCount(false, true, false);
-	unsigned int kidgamesCount = getSelected()->getKidGamesCount();
-	unsigned int visibleCount = getSelected()->getVisibleCount();*/
-	
 	// also change the text after we've fully faded out
 	setAnimation(infoFadeOut, 0, [this] {
+		// get item count string
+		unsigned int gameCount = getSelected()->getGameCount(true);
+		
 		std::stringstream ss;
-
-		// only display a game count if there are at least 2 games - Full / Kiosk UI modes
-		//LOG(LogDebug) << "System selected = " << getSelected()->getName() << ", UIMode = "<< Settings::getInstance()->getString("UIMode");
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, false, false) = " << getSelected()->getGameCount(false, false, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(true, false, false) = " << getSelected()->getGameCount(true, false, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, true, false) = " << getSelected()->getGameCount(false, true, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, false, true) = " << getSelected()->getGameCount(false, false, true);
-		//LOG(LogDebug) << "getSelected()->getGameCount(true, true, false) = " << getSelected()->getGameCount(true, true, false);
-		//LOG(LogDebug) << "getSelected()->getGameCount(false, true, true) = " << getSelected()->getGameCount(false, true, true);
-
-		if(Settings::getInstance()->getString("UIMode") == "Full")
-		{
-			unsigned int gameCount = getSelected()->getGameCount(false, false, false);
-			if (gameCount == 1)
-			{
-				ss << gameCount << " GAME";
-			}
-			else if (gameCount > 1)
-			{
-				ss << gameCount << " GAMES";
-			}
-			unsigned int favoritesCount = getSelected()->getGameCount(false, true, false);
-			if (favoritesCount == 1)
-			{
-				ss << ", " << favoritesCount << " FAVORITE";
-			}
-			else if (favoritesCount > 1)
-			{
-				ss << ", " << favoritesCount << " FAVORITES";
-			}
-			unsigned int kidgamesCount = getSelected()->getGameCount(false, false, true);
-			if (kidgamesCount == 1)
-			{
-				ss << ", " << kidgamesCount << " KID-FRIENDLY GAME";
-			}
-			else if (kidgamesCount > 1)
-			{
-				ss << ", " << kidgamesCount << " KID-FRIENDLY GAMES";
-			}
-			ss << " AVAILABLE.";
-		}else if(Settings::getInstance()->getString("UIMode") == "Kiosk")
-		{
-			unsigned int gameCount = getSelected()->getGameCount(true, false, false);
-			if (gameCount == 1)
-			{
-				ss << gameCount << " GAME";
-			}
-			else if (gameCount > 1)
-			{
-				ss << gameCount << " GAMES";
-			}
-			unsigned int favoritesCount = getSelected()->getGameCount(true, true, false);
-			if (favoritesCount == 1)
-			{
-				ss << ", " << favoritesCount << " FAVORITE";
-			}
-			else if (favoritesCount > 1)
-			{
-				ss << ", " << favoritesCount << " FAVORITES";
-			}
-			unsigned int kidgamesCount = getSelected()->getGameCount(true, false, true);
-			if (kidgamesCount == 1)
-			{
-				ss << ", " << kidgamesCount << " KID-FRIENDLY GAME";
-			}
-			else if (kidgamesCount > 1)
-			{
-				ss << ", " << kidgamesCount << " KID-FRIENDLY GAMES";
-			}
-			ss << " AVAILABLE.";
-		}else if(Settings::getInstance()->getString("UIMode") == "Kid")
-		{
-			unsigned int kidgamesCount = getSelected()->getGameCount(true, false, true);
-			if (kidgamesCount == 1)
-			{
-				ss << kidgamesCount << " KID-FRIENDLY GAME";
-			}
-			else if (kidgamesCount > 1)
-			{
-				ss << kidgamesCount << " KID-FRIENDLY GAMES";
-			}
-			unsigned int favoritesCount = getSelected()->getGameCount(true, true, true);
-			if (favoritesCount == 1)
-			{
-				ss << ", " << favoritesCount << " FAVORITE";
-			}
-			else if (favoritesCount > 1)
-			{
-				ss << ", " << favoritesCount << " FAVORITES";
-			}
-			ss << " AVAILABLE.";
-		}
+		ss << gameCount << " GAME";
+		gameCount > 1 ? (ss << "S"): (ss << "") ;
+		ss << " AVAILABLE.";
 
 		mSystemInfo.setText(ss.str());
 	}, false, 1);

@@ -64,23 +64,24 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 
 	mMenu.addWithLabel("SORT GAMES BY", mListSort);
 	
-	// Show favorites-only
+	// Toggle: Show favorites-only
 	auto favorite_only = std::make_shared<SwitchComponent>(mWindow);
 	favorite_only->setState(Settings::getInstance()->getBool("FavoritesOnly"));
 	mMenu.addWithLabel("FAVORITES ONLY", favorite_only);
 	addSaveFunc([favorite_only, this] {
+		
+		// First save to settings, in order for filtering to work
+		if (favorite_only->getState() != Settings::getInstance()->getBool("FavoritesOnly"))
+		{
+			Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState());
+			mFavoriteStateChanged = true;
+		}
 		if(favorite_only->getState())
 		{
-			bool filterHidden = ((Settings::getInstance()->getString("UIMode") == "Kiosk") ||
-								 (Settings::getInstance()->getString("UIMode") == "Kid"));
-			bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
 			bool hasFavorite = false;
-			
 			// check if there is anything at all to show, otherwise revert
-			for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
-			{
-				if( (*it)->getGameCount(filterHidden, favorite_only->getState(), filterKid) > 0 )
-				{
+			for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++) {
+				if( (*it)->getGameCount(true) > 0 ) {
 					hasFavorite = true;
 					break;
 				}
@@ -89,12 +90,8 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 			{
 				LOG(LogDebug) << "Nothing to show in selected favorites mode, resetting";
 				favorite_only->setState(false);			
+				Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState());
 			}
-		}
-		if(favorite_only->getState() != Settings::getInstance()->getBool("FavoritesOnly"))
-		{
-			Settings::getInstance()->setBool("FavoritesOnly", favorite_only->getState());
-			mFavoriteStateChanged = true;
 		}
 	});
 	
@@ -218,7 +215,6 @@ void GuiGamelistOptions::save()
 void GuiGamelistOptions::SurpriseMe()
 {
 	LOG(LogDebug) << "GuiGamelistOptions::SurpriseMe()";
-	bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");	
-	ViewController::get()->goToRandomGame(true, false, filterKid);
+	ViewController::get()->goToRandomGame();
 	delete this;
 }

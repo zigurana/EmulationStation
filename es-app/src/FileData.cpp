@@ -78,46 +78,71 @@ std::string FileData::getCleanName() const
 
 const std::string& FileData::getThumbnailPath() const
 {
-	if(!metadata.get("thumbnail").empty())
+	if(!metadata.get("thumbnail").empty()) {
 		return metadata.get("thumbnail");
-	else
+	} else {
 		return metadata.get("image");
+	}
+}
+
+std::vector<FileData*> FileData::getChildren(bool filter) const
+{
+	LOG(LogDebug) << "FileData::getChildren(" << filter << ")";
+	std::vector<FileData*> fileList = mChildren;
+	LOG(LogDebug) << "   fileList.size() = " << fileList.size();
+
+	if (filter)
+	{
+		//filter out unwanted items from mChildren
+		LOG(LogDebug) << "   filtering";
+
+		bool filterHidden = (Settings::getInstance()->getString("UIMode") != "Full");
+		bool filterFav = (Settings::getInstance()->getBool("FavoritesOnly"));
+		bool filterKid = (Settings::getInstance()->getString("UIMode") != "Kid");
+		
+		// then filter out all we do not want.
+		if (filterHidden) {
+			fileList = filterFileData(fileList, "hidden", "false");
+		}
+		if (filterFav) {
+			fileList = filterFileData(fileList, "favorite", "true");
+		}
+		if (filterKid) {
+			fileList = filterFileData(fileList, "kidgame", "true");
+		}
+
+	}
+	LOG(LogDebug) << "   returning " << fileList.size() << " files, done.";
+
+	return fileList;
 }
 
 
-std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filterHidden, bool filterFav, bool filterKid) const
+// todo: get filtered results from get children funtion 
+//(are there examples of unfiltered, or partially filtered calls tho this function??)
+std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filter) const
 {
-	//LOG(LogDebug) << "FileData::getFilesRecursive(" << filterHidden << filterFav << filterKid << ")";
-		std::vector<FileData*> fileList;
+	LOG(LogDebug) << "FileData::getFilesRecursive(" << filter << ")";
 
 	// first populate with all we can find
-	for(auto it = mChildren.begin(); it != mChildren.end(); it++)
+	std::vector<FileData*> allfiles = getChildren(filter);
+		std::vector<FileData*> fileList;
+
+	for(auto it = allfiles.begin(); it != allfiles.end(); it++) 
 	{
-		if((*it)->getType() & typeMask)
+		if((*it)->getType() & typeMask) {
 			fileList.push_back(*it);
+		}
 		
-		if((*it)->getChildren().size() > 0)
-		{
+		if((*it)->getChildren(filter).size() > 0) {
 			//LOG(LogDebug) << "FileData::getFilesRecursive(): Recursing!";
-			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask, filterHidden, filterFav, filterKid);
+			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask, filter);
 			fileList.insert(fileList.end(), subchildren.cbegin(), subchildren.cend());
 		}
 	}
 		
-	// then filter out all we do not want.
-	if(filterHidden)
-	{
-		fileList = filterFileData(fileList, "hidden", "false");
-	}
-	if(filterFav)
-	{
-		fileList = filterFileData(fileList, "favorite", "true");
-	}
-	if(filterKid)
-	{
-		fileList = filterFileData(fileList, "kidgame", "true");
-	}
-	//LOG(LogDebug) << "   Found " << fileList.size() << " games";
+
+	LOG(LogDebug) << "   Found " << fileList.size() << " games";
 	return fileList;
 }
 
@@ -188,12 +213,12 @@ void FileData::sort(const SortType& type)
 	sort(*type.comparisonFunction, type.ascending);
 }
 
-FileData* FileData::getRandom(bool filterHidden, bool filterFav, bool filterKid) const
+FileData* FileData::getRandom() const
 {
-	LOG(LogDebug) << "FileData::getRandom("<< filterHidden << ", " << filterFav << ", " << filterKid << ")";
+	LOG(LogDebug) << "FileData::getRandom()";
 	
 	//Get list of files
-	std::vector<FileData*> list = getFilesRecursive(GAME,filterHidden, filterFav, filterKid);
+	std::vector<FileData*> list = getFilesRecursive(GAME,true); // always filter
 	const unsigned long n = list.size();
 	LOG(LogDebug) << "   found games: " << n;
 	
@@ -201,7 +226,9 @@ FileData* FileData::getRandom(bool filterHidden, bool filterFav, bool filterKid)
 	//const unsigned long divisor = (RAND_MAX + 1) / n;
 	const unsigned long divisor = (RAND_MAX) / n; // the above is correct, but gives compiler warning.
 	unsigned long k;
-	do { k = std::rand() / divisor; } while (k >= n); // pick the first within range
+	do {
+		k = std::rand() / divisor;
+	} while (k >= n); // pick the first within range
 	
 	LOG(LogDebug) << "   Picked game: " << list.at(k)->getName();
 	return list.at(k);	

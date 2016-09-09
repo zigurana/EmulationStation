@@ -34,3 +34,4 @@ Makefile
 nbproject
 *.orig
 nbproject/private/private.xml
+*.bak

@@ -27,12 +27,12 @@ public:
 	void setAllInvalidGamesList(SystemData* systemExclude);
 
 	// Navigation.
-	void goToNextGameList(bool bhidden, bool bfav, bool bkid);
-	void goToPrevGameList(bool bhidden, bool bfav, bool bkid);
+	void goToNextGameList();
+	void goToPrevGameList();
 	void goToGameList(SystemData* system);
 	void goToSystemView(SystemData* system);
 	void goToStart();
-	void goToRandomGame(bool bhidden, bool bfav, bool bkid);
+	void goToRandomGame();
 
 	void onFileChanged(FileData* file, FileChangeType change);
 
