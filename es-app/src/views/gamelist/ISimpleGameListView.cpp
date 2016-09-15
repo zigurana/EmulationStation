@@ -50,7 +50,7 @@ void ISimpleGameListView::onFileChanged(FileData* file, FileChangeType change)
 	// we could be tricky here to be efficient;
 	// but this shouldn't happen very often so we'll just always repopulate
 	FileData* cursor = getCursor();
-	populateList(cursor->getParent()->getChildren());
+	populateList(cursor->getParent()->getChildren(true));
 	setCursor(cursor);
 }
 
@@ -68,10 +68,10 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 				launch(cursor);
 			}else{
 				// it's a folder
-				if(cursor->getChildren().size() > 0)
+				if(cursor->getChildren(true).size() > 0)
 				{
 					mCursorStack.push(cursor);
-					populateList(cursor->getChildren());
+					populateList(cursor->getChildren(true));
 				}
 			}
 				
@@ -81,7 +81,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			LOG(LogDebug) << "ISimpleGameListView::input(): b detected!";
 			if(mCursorStack.size())
 			{
-				populateList(mCursorStack.top()->getParent()->getChildren());
+				populateList(mCursorStack.top()->getParent()->getChildren(true));
 				setCursor(mCursorStack.top());
 				mCursorStack.pop();
 				Sound::getFromTheme(getTheme(), getName(), "back")->play();

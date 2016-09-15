@@ -113,8 +113,9 @@ void ViewController::goToGameList(SystemData* system)
 
 	if (mInvalidGameList[system] == true)
 	{
-		updateFavorite(system, getGameListView(system).get()->getCursor());
-		updateKidGame(system, getGameListView(system).get()->getCursor());
+		updateView(system, getGameListView(system).get()->getCursor());
+		//updateFavorite(system, getGameListView(system).get()->getCursor());
+		//updateKidGame(system, getGameListView(system).get()->getCursor());
 		
 		if ((mFavoritesOnly != Settings::getInstance()->getBool("FavoritesOnly")) ||
 			(mKidGamesOnly != (Settings::getInstance()->getString("UIMode") == "Kid")))
@@ -147,13 +148,13 @@ void ViewController::goToRandomGame()
 	//mCurrentView.get()->setCursor(selected);
 	LOG(LogDebug) << "ViewController::goToRandomGame: done.";
 }
-
+/*
 void ViewController::updateFavorite(SystemData* system, FileData* file)
 {
 	IGameListView* view = getGameListView(system).get();
 	if (Settings::getInstance()->getBool("FavoritesOnly"))
 	{
-		const std::vector<FileData*>& files = system->getRootFolder()->getChildren();
+		const std::vector<FileData*>& files = system->getRootFolder()->getChildren(true);
 		view->populateList(files);
 		int pos = std::find(files.begin(), files.end(), file) - files.begin();
 		bool found = false;
@@ -193,22 +194,25 @@ void ViewController::updateFavorite(SystemData* system, FileData* file)
 
 	view->updateInfoPanel();
 }
+
+// presumably, this function tries to shift the focus to the next (or previous) kidgame, when the display
+// mode demands it. This should be solved by reducing the total view/list to contain only valid items.
 void ViewController::updateKidGame(SystemData* system, FileData* file)
 {
 	IGameListView* view = getGameListView(system).get();
-	if (Settings::getInstance()->getString("UIMode") == "Kid")
+	if (Settings::getInstance()->getString("UIMode") == "Kid")  // if we are in kidsmode
 	{
-		const std::vector<FileData*>& files = system->getRootFolder()->getChildren();
-		view->populateList(files);
-		int pos = std::find(files.begin(), files.end(), file) - files.begin();
-		bool found = false;
-		for (auto it = files.begin() + pos; it != files.end(); it++)
+		const std::vector<FileData*>& files = system->getRootFolder()->getChildren(true);
+		view->populateList(files);																// populate a new view 
+		int pos = std::find(files.begin(), files.end(), file) - files.begin();					// save current position in that view
+		bool found = false;							
+		for (auto it = files.begin() + pos; it != files.end(); it++)							//try to find another kidgame
 		{
 			if ((*it)->getType() == GAME)
 			{
 				if ((*it)->metadata.get("kidgame").compare("true") == 0)
 				{
-					view->setCursor(*it);
+					view->setCursor(*it);														// and set the cursor to that one
 					found = true;
 					break;
 				}
@@ -236,8 +240,20 @@ void ViewController::updateKidGame(SystemData* system, FileData* file)
 		}
 	}
 
-	view->updateInfoPanel();
+	view->updateInfoPanel(); //update metadata display
 }
+ ***/
+
+// Update the view after a viewing mode change has occured (fav only, or hide files, or kids only)
+void ViewController::updateView(SystemData* system, FileData* file)
+{
+	IGameListView* view = getGameListView(system).get();
+	const std::vector<FileData*>& files = system->getRootFolder()->getChildren(true);
+	view->populateList(files);	
+	view->setCursor(*(files.begin())); 
+	view->updateInfoPanel(); 
+}
+
 
 void ViewController::playViewTransition()
 {

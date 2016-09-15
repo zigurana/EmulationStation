@@ -94,11 +94,11 @@ std::vector<FileData*> FileData::getChildren(bool filter) const
 	if (filter)
 	{
 		//filter out unwanted items from mChildren
-		LOG(LogDebug) << "   filtering";
-
 		bool filterHidden = (Settings::getInstance()->getString("UIMode") != "Full");
 		bool filterFav = (Settings::getInstance()->getBool("FavoritesOnly"));
-		bool filterKid = (Settings::getInstance()->getString("UIMode") != "Kid");
+		bool filterKid = (Settings::getInstance()->getString("UIMode") == "Kid");
+		
+		LOG(LogDebug) << "   filtering (" << filterHidden << filterFav << filterKid << ").";
 		
 		// then filter out all we do not want.
 		if (filterHidden) {
@@ -112,21 +112,21 @@ std::vector<FileData*> FileData::getChildren(bool filter) const
 		}
 
 	}
-	LOG(LogDebug) << "   returning " << fileList.size() << " files, done.";
+	//LOG(LogDebug) << "   returning " << fileList.size() << " files, done.";
 
 	return fileList;
 }
 
 
-// todo: get filtered results from get children funtion 
-//(are there examples of unfiltered, or partially filtered calls tho this function??)
 std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool filter) const
 {
 	LOG(LogDebug) << "FileData::getFilesRecursive(" << filter << ")";
 
 	// first populate with all we can find
 	std::vector<FileData*> allfiles = getChildren(filter);
-		std::vector<FileData*> fileList;
+	std::vector<FileData*> fileList;
+	
+	//LOG(LogDebug) << "FileData::getFilesRecursive(): allfiles contains " << allfiles.size() << " items";
 
 	for(auto it = allfiles.begin(); it != allfiles.end(); it++) 
 	{
@@ -134,7 +134,7 @@ std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool f
 			fileList.push_back(*it);
 		}
 		
-		if((*it)->getChildren(filter).size() > 0) {
+		if((*it)->getChildren(filter).size() > 1) {
 			//LOG(LogDebug) << "FileData::getFilesRecursive(): Recursing!";
 			std::vector<FileData*> subchildren = (*it)->getFilesRecursive(typeMask, filter);
 			fileList.insert(fileList.end(), subchildren.cbegin(), subchildren.cend());
@@ -142,25 +142,21 @@ std::vector<FileData*> FileData::getFilesRecursive(unsigned int typeMask, bool f
 	}
 		
 
-	LOG(LogDebug) << "   Found " << fileList.size() << " games";
+	LOG(LogDebug) << "FileData::getFilesRecursive():returning " << fileList.size() << " games";
 	return fileList;
 }
 
 std::vector<FileData*> FileData::filterFileData(std::vector<FileData*> in, std::string filtername, std::string passString) const
 {
+	//LOG(LogDebug) << "FileData::filterFileData(" << filtername << ", needs to be: " << passString << ")";
+
 	std::vector<FileData*> out;
 
 	for (auto it = in.begin(); it != in.end(); it++)
 	{
-		if((*it)->getType() == FOLDER)
+		if ((*it)->metadata.get(filtername).compare(passString) == 0)
 		{
-			out.push_back(*it); // for now just include all subfolders, even though they might be empty.
-		}else
-		{
-			if ((*it)->metadata.get(filtername).compare(passString) == 0)
-			{
-				out.push_back(*it);
-			}
+			out.push_back(*it);
 		}
 	}
 

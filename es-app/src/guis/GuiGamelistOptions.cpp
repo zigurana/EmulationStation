@@ -148,7 +148,7 @@ void GuiGamelistOptions::jumpToLetter()
 	IGameListView* gamelist = getGamelist();
 
 	// this is a really shitty way to get a list of files
-	const std::vector<FileData*>& files = gamelist->getCursor()->getParent()->getChildren();
+	const std::vector<FileData*>& files = gamelist->getCursor()->getParent()->getChildren(true);
 	
 	long min = 0;
 	long max = files.size() - 1;

@@ -37,7 +37,7 @@ void SystemView::populate()
 	mEntries.clear();
 	for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++)
 	{
-		LOG(LogDebug) << "    System = " << (*it)->getName();
+		LOG(LogDebug) << "   SYSTEM = " << (*it)->getName();
 		
 		if ((*it)->getGameCount(true) > 0) {
 			LOG(LogDebug) << (*it)->getGameCount(true) << " games found, populating.";

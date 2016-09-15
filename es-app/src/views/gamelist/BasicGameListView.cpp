@@ -55,7 +55,7 @@ void BasicGameListView::populateList(const std::vector<FileData*>& files)
 	for (auto it = files.begin(); it != files.end(); it++) {
 		if ((*it)->getType() == GAME)
 		{
-							mList.add((*it)->getName(), *it, 0);
+			mList.add((*it)->getName(), *it, 0);
 		} else { // its a folder!
 			mList.add((*it)->getName(), *it, 1);
 		}
@@ -72,7 +72,7 @@ void BasicGameListView::setCursor(FileData* cursor)
 {
 	if(!mList.setCursor(cursor))
 	{
-		populateList(cursor->getParent()->getChildren());
+		populateList(cursor->getParent()->getChildren(true));
 		mList.setCursor(cursor);
 
 		// update our cursor stack in case our cursor just got set to some folder we weren't in before
@@ -107,7 +107,7 @@ void BasicGameListView::remove(FileData *game)
 	boost::filesystem::remove(game->getPath());  // actually delete the file on the filesystem
 	if (getCursor() == game)                     // Select next element in list, or prev if none
 	{
-		std::vector<FileData*> siblings = game->getParent()->getChildren();
+		std::vector<FileData*> siblings = game->getParent()->getChildren(true);
 		auto gameIter = std::find(siblings.begin(), siblings.end(), game);
 		auto gamePos = std::distance(siblings.begin(), gameIter);
 		if (gameIter != siblings.end())

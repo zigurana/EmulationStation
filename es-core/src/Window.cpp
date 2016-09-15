@@ -398,6 +398,7 @@ void Window::ListenForPassKeySequence(InputConfig* config, Input input)
 		if(Settings::getInstance()->getString("UIMode") == "Full")
 			break;
 		}
+		
 		if(quitES("/tmp/es-restart") != 0)
 			LOG(LogWarning) << "Restart terminated with non-zero result!";
 
