@@ -96,17 +96,36 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	});
 
 	// Toggle: Show hidden
-	auto show_hidden = std::make_shared<SwitchComponent>(mWindow);
-	show_hidden->setState(Settings::getInstance()->getBool("ShowHidden"));
-	mMenu.addWithLabel("SHOW HIDDEN", show_hidden);
-	addSaveFunc([show_hidden, this] {
-		// First save to settings, in order for filtering to work
-		if (show_hidden->getState() != Settings::getInstance()->getBool("ShowHidden"))
-		{
-			Settings::getInstance()->setBool("ShowHidden", show_hidden->getState());
-			mHiddenStateChanged = true;
-		}
-	});
+	if(Settings::getInstance()->getString("UIMode") == "Full")
+	{
+		auto show_hidden = std::make_shared<SwitchComponent>(mWindow);
+		show_hidden->setState(Settings::getInstance()->getBool("ShowHidden"));
+		mMenu.addWithLabel("SHOW HIDDEN", show_hidden);
+		addSaveFunc([show_hidden, this] {
+			// First save to settings, in order for filtering to work
+			if(show_hidden->getState() != Settings::getInstance()->getBool("ShowHidden"))
+			{
+				Settings::getInstance()->setBool("ShowHidden", show_hidden->getState());
+				mHiddenStateChanged = true;
+			}
+			if(!show_hidden->getState())
+			{
+				bool hasNonHidden = false;
+				for(auto it = SystemData::sSystemVector.begin(); it != SystemData::sSystemVector.end(); it++) {
+					if( (*it)->getGameCount(true) > 0 ) {
+						hasNonHidden = true;
+						break;
+					}
+				}
+				if(!hasNonHidden)
+				{
+					LOG(LogDebug) << "Nothing to show in selected show hidden mode, resetting";
+					show_hidden->setState(true);
+					Settings::getInstance()->setBool("ShowHidden", show_hidden->getState());
+				}
+			}
+		});
+	}
 
 	// edit game metadata - only in Full UI mode
 	if(Settings::getInstance()->getString("UIMode") == "Full")
