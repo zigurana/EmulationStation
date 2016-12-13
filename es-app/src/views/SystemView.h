@@ -17,6 +17,21 @@ struct SystemViewData
 	std::shared_ptr<ThemeExtras> backgroundExtras;
 };
 
+struct SystemViewCarousel
+{
+	float ypos; 
+	float height;
+	float logoScale;
+	float logoSpacingX;
+	float logoSpacingY;
+	unsigned int color;
+	unsigned int infoBarColor;
+	int maxLogoCount;  // maximum number of logos shown on the carousel
+	float logoSizeX;
+	float logoSizeY;
+	std::shared_ptr<Font> infoBarFont;
+};
+
 class SystemView : public IList<SystemViewData, SystemData*>
 {
 public:
@@ -27,6 +42,10 @@ public:
 	bool input(InputConfig* config, Input input) override;
 	void update(int deltaTime) override;
 	void render(const Eigen::Affine3f& parentTrans) override;
+	void renderCarousel(const Eigen::Affine3f& parentTrans);
+	void renderExtras(const Eigen::Affine3f& parentTrans);
+
+	void onThemeChanged(const std::shared_ptr<ThemeData>& theme);
 
 	std::vector<HelpPrompt> getHelpPrompts() override;
 	virtual HelpStyle getHelpStyle() override;
@@ -35,11 +54,12 @@ protected:
 	void onCursorChanged(const CursorState& state) override;
 
 private:
-	inline Eigen::Vector2f logoSize() const { return Eigen::Vector2f(mSize.x() * 0.25f, mSize.y() * 0.155f); }
+	inline Eigen::Vector2f logoSize() const { return Eigen::Vector2f(mSize.x() * 0.10f, mSize.y() * 0.155f); }
 
 	void populate();
 
 	TextComponent mSystemInfo;
+	SystemViewCarousel mCarousel;
 
 	// unit is list index
 	float mCamOffset;

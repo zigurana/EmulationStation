@@ -82,12 +82,24 @@ std::map< std::string, ElementMapType > ThemeData::sElementMap = boost::assign::
 		("textColor", COLOR)
 		("iconColor", COLOR)
 		("fontPath", PATH)
-		("fontSize", FLOAT)));
+		("fontSize", FLOAT)))
+	("systemcarousel", makeMap(boost::assign::map_list_of
+		("height", FLOAT)
+		("ypos", FLOAT)
+		("color", COLOR)
+		("infobarcolor", COLOR)
+		("infobarfontcolor", COLOR)
+		("infobarfontpath", PATH)
+		("infobarfontsize", FLOAT)
+		("logoscale", FLOAT)
+		("logosizex", FLOAT)
+		("logosizey", FLOAT)
+		("maxlogocount", FLOAT)));
 
 namespace fs = boost::filesystem;
 
 #define MINIMUM_THEME_FORMAT_VERSION 3
-#define CURRENT_THEME_FORMAT_VERSION 3
+#define CURRENT_THEME_FORMAT_VERSION 4
 
 // helper
 unsigned int getHexColor(const char* str)

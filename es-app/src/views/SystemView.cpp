@@ -9,10 +9,6 @@
 #include "Settings.h"
 #include "Util.h"
 
-#define SELECTED_SCALE 1.5f
-#define LOGO_PADDING ((logoSize().x() * (SELECTED_SCALE - 1)/2) + (mSize.x() * 0.06f))
-#define BAND_HEIGHT (logoSize().y() * SELECTED_SCALE)
-
 SystemView::SystemView(Window* window) : IList<SystemViewData, SystemData*>(window, LIST_SCROLL_STYLE_SLOW, LIST_ALWAYS_LOOP),
 	mSystemInfo(window, "SYSTEM INFO", Font::get(FONT_SIZE_SMALL), 0x33333300, ALIGN_CENTER)
 {
@@ -21,10 +17,6 @@ SystemView::SystemView(Window* window) : IList<SystemViewData, SystemData*>(wind
 	mExtrasFadeOpacity = 0.0f;
 
 	setSize((float)Renderer::getScreenWidth(), (float)Renderer::getScreenHeight());
-
-	mSystemInfo.setSize(mSize.x(), mSystemInfo.getSize().y() * 1.333f);
-	mSystemInfo.setPosition(0, (mSize.y() + BAND_HEIGHT) / 2);
-
 	populate();
 }
 
@@ -36,6 +28,8 @@ void SystemView::populate()
 	{
 		const std::shared_ptr<ThemeData>& theme = (*it)->getTheme();
 
+		onThemeChanged(theme);
+
 		Entry e;
 		e.name = (*it)->getName();
 		e.object = *it;
@@ -44,16 +38,17 @@ void SystemView::populate()
 		if(theme->getElement("system", "logo", "image"))
 		{
 			ImageComponent* logo = new ImageComponent(mWindow);
-			logo->setMaxSize(Eigen::Vector2f(logoSize().x(), logoSize().y()));
+			logo->setMaxSize(Eigen::Vector2f(mCarousel.logoSizeX, mCarousel.logoSizeY));
 			logo->applyTheme((*it)->getTheme(), "system", "logo", ThemeFlags::PATH);
-			logo->setPosition((logoSize().x() - logo->getSize().x()) / 2, (logoSize().y() - logo->getSize().y()) / 2); // center
+			logo->setPosition((mCarousel.logoSizeX - logo->getSize().x()) / 2,
+				              (mCarousel.logoSizeY - logo->getSize().y()) / 2); // center
 			e.data.logo = std::shared_ptr<GuiComponent>(logo);
 
 			ImageComponent* logoSelected = new ImageComponent(mWindow);
-			logoSelected->setMaxSize(Eigen::Vector2f(logoSize().x() * SELECTED_SCALE, logoSize().y() * SELECTED_SCALE * 0.70f));
+			logoSelected->setMaxSize(Eigen::Vector2f(mCarousel.logoSizeX * mCarousel.logoScale, mCarousel.logoSizeY * mCarousel.logoScale));
 			logoSelected->applyTheme((*it)->getTheme(), "system", "logo", ThemeFlags::PATH);
-			logoSelected->setPosition((logoSize().x() - logoSelected->getSize().x()) / 2, 
-				(logoSize().y() - logoSelected->getSize().y()) / 2); // center
+			logoSelected->setPosition((mCarousel.logoSizeX - logoSelected->getSize().x()) / 2,
+									  (mCarousel.logoSizeY - logoSelected->getSize().y()) / 2); // center
 			e.data.logoSelected = std::shared_ptr<GuiComponent>(logoSelected);
 		}else{
 			// no logo in theme; use text
@@ -67,7 +62,8 @@ void SystemView::populate()
 
 			TextComponent* textSelected = new TextComponent(mWindow, 
 				(*it)->getName(), 
-				Font::get((int)(FONT_SIZE_LARGE * SELECTED_SCALE)), 
+					//Font::get((int)(FONT_SIZE_LARGE * SELECTED_SCALE)),
+					Font::get((int)(FONT_SIZE_LARGE * 1.5)),
 				0x000000FF, 
 				ALIGN_CENTER);
 			textSelected->setSize(logoSize());
@@ -96,14 +92,14 @@ bool SystemView::input(InputConfig* config, Input input)
 	{
 		if(config->getDeviceId() == DEVICE_KEYBOARD && input.value && input.id == SDLK_r && SDL_GetModState() & KMOD_LCTRL && Settings::getInstance()->getBool("Debug"))
 		{
-			LOG(LogInfo) << " Reloading SystemList view";
+			LOG(LogInfo) << " Reloading all";
+			ViewController::get()->reloadAll();
+			//// reload themes
+			//for(auto it = mEntries.begin(); it != mEntries.end(); it++)
+			//	it->object->loadTheme();
 
-			// reload themes
-			for(auto it = mEntries.begin(); it != mEntries.end(); it++)
-				it->object->loadTheme();
-
-			populate();
-			updateHelpPrompts();
+			//populate();
+			//updateHelpPrompts();
 			return true;
 		}
 		if(config->isMappedTo("left", input))
@@ -254,81 +250,10 @@ void SystemView::onCursorChanged(const CursorState& state)
 void SystemView::render(const Eigen::Affine3f& parentTrans)
 {
 	if(size() == 0)
-		return;
-
-	Eigen::Affine3f trans = getTransform() * parentTrans;
+		return;  // nothing to render
 	
-	// draw the list elements (titles, backgrounds, logos)
-	const float logoSizeX = logoSize().x() + LOGO_PADDING;
-
-	int logoCount = (int)(mSize.x() / logoSizeX) + 2; // how many logos we need to draw
-	int center = (int)(mCamOffset);
-
-	if(mEntries.size() == 1)
-		logoCount = 1;
-
-	// draw background extras
-	Eigen::Affine3f extrasTrans = trans;
-	int extrasCenter = (int)mExtrasCamOffset;
-	for(int i = extrasCenter - 1; i < extrasCenter + 2; i++)
-	{
-		int index = i;
-		while(index < 0)
-			index += mEntries.size();
-		while(index >= (int)mEntries.size())
-			index -= mEntries.size();
-
-		extrasTrans.translation() = trans.translation() + Eigen::Vector3f((i - mExtrasCamOffset) * mSize.x(), 0, 0);
-
-		Eigen::Vector2i clipRect = Eigen::Vector2i((int)((i - mExtrasCamOffset) * mSize.x()), 0);
-		Renderer::pushClipRect(clipRect, mSize.cast<int>());
-		mEntries.at(index).data.backgroundExtras->render(extrasTrans);
-		Renderer::popClipRect();
-	}
-
-	// fade extras if necessary
-	if(mExtrasFadeOpacity)
-	{
-		Renderer::setMatrix(trans);
-		Renderer::drawRect(0.0f, 0.0f, mSize.x(), mSize.y(), 0x00000000 | (unsigned char)(mExtrasFadeOpacity * 255));
-	}
-
-	// draw logos
-	float xOff = (mSize.x() - logoSize().x())/2 - (mCamOffset * logoSizeX);
-	float yOff = (mSize.y() - logoSize().y())/2;
-
-	// background behind the logos
-	Renderer::setMatrix(trans);
-	Renderer::drawRect(0.f, (mSize.y() - BAND_HEIGHT) / 2, mSize.x(), BAND_HEIGHT, 0xFFFFFFD8);
-
-	Eigen::Affine3f logoTrans = trans;
-	for(int i = center - logoCount/2; i < center + logoCount/2 + 1; i++)
-	{
-		int index = i;
-		while(index < 0)
-			index += mEntries.size();
-		while(index >= (int)mEntries.size())
-			index -= mEntries.size();
-
-		logoTrans.translation() = trans.translation() + Eigen::Vector3f(i * logoSizeX + xOff, yOff, 0);
-
-		if(index == mCursor) //scale our selection up
-		{
-			// selected
-			const std::shared_ptr<GuiComponent>& comp = mEntries.at(index).data.logoSelected;
-			comp->setOpacity(0xFF);
-			comp->render(logoTrans);
-		}else{
-			// not selected
-			const std::shared_ptr<GuiComponent>& comp = mEntries.at(index).data.logo;
-			comp->setOpacity(0x80);
-			comp->render(logoTrans);
-		}
-	}
-
-	Renderer::setMatrix(trans);
-	Renderer::drawRect(mSystemInfo.getPosition().x(), mSystemInfo.getPosition().y() - 1, mSize.x(), mSystemInfo.getSize().y(), 0xDDDDDD00 | (unsigned char)(mSystemInfo.getOpacity() / 255.f * 0xD8));
-	mSystemInfo.render(trans);
+	renderExtras(parentTrans);
+	renderCarousel(parentTrans);
 }
 
 std::vector<HelpPrompt> SystemView::getHelpPrompts()
@@ -344,4 +269,141 @@ HelpStyle SystemView::getHelpStyle()
 	HelpStyle style;
 	style.applyTheme(mEntries.at(mCursor).object->getTheme(), "system");
 	return style;
+}
+
+
+// It would be cleanest if this function handles all theme-related actions,
+// but for now, it just sets the struct for the carousel parameters.
+void  SystemView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
+{
+	LOG(LogDebug) << "SystemView::onThemeChanged()";
+
+	// set up defaults
+	mCarousel.height          = 0.2f * mSize.y();
+	mCarousel.ypos            = 0.5f * (mSize.y() - mCarousel.height); // default is centered
+	mCarousel.color           = 0xffffff90; 
+	mCarousel.infoBarColor    = 0x909090ff;		
+	mCarousel.logoScale       = 1.5f;
+	mCarousel.logoSizeX       = 0.15f * mSize.y();
+	mCarousel.logoSizeY		  = 0.2f * mSize.y();
+	mCarousel.maxLogoCount    = 3;
+	std::string  fpath        = Font::getDefaultPath();
+	float        fsize        = 0.035f;
+	unsigned int fcolor       = 0x000000ff;
+
+	const ThemeData::ThemeElement* elem = theme->getElement("system", "carousel", "systemcarousel");
+	if(elem)
+	{
+		if (elem->has("height"))
+			mCarousel.height = elem->get<float>("height") * mSize.y();
+		if (elem->has("ypos"))
+			mCarousel.ypos = elem->get<float>("ypos") * mSize.y();
+		if (elem->has("color"))
+			mCarousel.color = elem->get<unsigned int>("color");
+		if (elem->has("infobarcolor"))
+			mCarousel.infoBarColor = elem->get<unsigned int>("infobarcolor");
+		if (elem->has("logoscale"))
+			mCarousel.logoScale = elem->get<float>("logoscale");
+		if (elem->has("logosizex"))
+			mCarousel.logoSizeX = elem->get<float>("logosizex") * mSize.y();
+		if (elem->has("logosizey"))
+			mCarousel.logoSizeY = elem->get<float>("logosizey") * mSize.y();
+		if (elem->has("maxlogocount"))
+			mCarousel.maxLogoCount = std::round(elem->get<float>("maxlogocount"));
+		if (elem->has("infobarfontpath"))
+			fpath = elem->get<std::string>("infobarfontpath");
+		if (elem->has("infobarfontsize"))
+			fsize = elem->get<float>("infobarfontsize");
+		if (elem->has("infobarfontcolor"))
+			fcolor = elem->get<unsigned int>("infobarfontcolor");
+	}
+	mCarousel.logoSpacingX = (mSize.x() - (mCarousel.logoSizeX * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
+	mSystemInfo.setFont(Font::get((int)(fsize * mSize.y()), fpath));
+	mSystemInfo.setColor(fcolor);
+
+	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*1.5f);
+	mSystemInfo.setPosition(0, (mCarousel.ypos + mCarousel.height));
+	
+	LOG(LogDebug) << "SystemView::onThemeChanged():end";
+}
+
+// Render system carousel
+void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
+{
+	Eigen::Affine3f trans = getTransform() * parentTrans;
+
+	// Get number of logo's in caroussel
+	int logoCount = std::min(mCarousel.maxLogoCount, (int)mEntries.size());
+
+	// background behind the logos <- Caroussel
+	Renderer::setMatrix(trans);
+	Renderer::drawRect(0.f, mCarousel.ypos, mSize.x(), mCarousel.height, mCarousel.color);
+
+	// draw logos
+	float xOff = (mSize.x() - mCarousel.logoSizeX) / 2 - (mCamOffset * (mCarousel.logoSizeX + mCarousel.logoSpacingX));
+	float yOff = mCarousel.ypos + (mCarousel.height / 2) - (mCarousel.logoSizeY / 2);
+	Eigen::Affine3f logoTrans = trans;
+
+	int center = (int)(mCamOffset);
+	for (int i = center - logoCount / 2; i < center + logoCount / 2 + 1; i++)
+	{
+		int index = i;
+		while (index < 0)
+			index += mEntries.size();
+		while (index >= (int)mEntries.size())
+			index -= mEntries.size();
+
+		logoTrans.translation() = trans.translation() + Eigen::Vector3f(i * (mCarousel.logoSizeX + mCarousel.logoSpacingX) + xOff, yOff, 0);
+
+		if (index == mCursor) //scale our selection up
+		{
+			// selected
+			const std::shared_ptr<GuiComponent>& comp = mEntries.at(index).data.logoSelected;
+			comp->setOpacity(0xFF);
+			comp->render(logoTrans);
+		}
+		else {
+			// not selected
+			const std::shared_ptr<GuiComponent>& comp = mEntries.at(index).data.logo;
+			comp->setOpacity(0x80);
+			comp->render(logoTrans);
+		}
+	}
+
+	// Finally, render systeminfo bar and text
+	Renderer::setMatrix(trans);
+	Renderer::drawRect(mSystemInfo.getPosition().x(), mSystemInfo.getPosition().y() - 1,
+					mSize.x(), mSystemInfo.getSize().y(),
+					mCarousel.infoBarColor | (unsigned char)(mSystemInfo.getOpacity() / 255.f));
+	mSystemInfo.render(trans);
+}
+
+// Draw background extras
+void SystemView::renderExtras(const Eigen::Affine3f& parentTrans)
+{
+	Eigen::Affine3f trans = getTransform() * parentTrans;
+	Eigen::Affine3f extrasTrans = trans;
+	int extrasCenter = (int)mExtrasCamOffset;
+	for (int i = extrasCenter - 1; i < extrasCenter + 2; i++)
+	{
+		int index = i;
+		while (index < 0)
+			index += mEntries.size();
+		while (index >= (int)mEntries.size())
+			index -= mEntries.size();
+
+		extrasTrans.translation() = trans.translation() + Eigen::Vector3f((i - mExtrasCamOffset) * mSize.x(), 0, 0);
+
+		Eigen::Vector2i clipRect = Eigen::Vector2i((int)((i - mExtrasCamOffset) * mSize.x()), 0);
+		Renderer::pushClipRect(clipRect, mSize.cast<int>());
+		mEntries.at(index).data.backgroundExtras->render(extrasTrans);
+		Renderer::popClipRect();
+	}
+
+	// fade extras if necessary
+	if (mExtrasFadeOpacity)
+	{
+		Renderer::setMatrix(trans);
+		Renderer::drawRect(0.0f, 0.0f, mSize.x(), mSize.y(), 0x00000000 | (unsigned char)(mExtrasFadeOpacity * 255));
+	}
 }
