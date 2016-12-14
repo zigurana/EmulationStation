@@ -83,6 +83,14 @@ std::map< std::string, ElementMapType > ThemeData::sElementMap = boost::assign::
 		("iconColor", COLOR)
 		("fontPath", PATH)
 		("fontSize", FLOAT)))
+	("video", makeMap(boost::assign::map_list_of
+		("pos", NORMALIZED_PAIR)
+		("size", NORMALIZED_PAIR)
+		("origin", NORMALIZED_PAIR)
+		("default", PATH)
+		("delay", FLOAT)
+		("showSnapshotNoVideo", BOOLEAN)
+		("showSnapshotDelay", BOOLEAN)))
 	("systemcarousel", makeMap(boost::assign::map_list_of
 		("height", FLOAT)
 		("ypos", FLOAT)
