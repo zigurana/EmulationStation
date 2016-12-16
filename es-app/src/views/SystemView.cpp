@@ -281,11 +281,11 @@ void  SystemView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
 	// set up defaults
 	mCarousel.height          = 0.2f * mSize.y();
 	mCarousel.ypos            = 0.5f * (mSize.y() - mCarousel.height); // default is centered
-	mCarousel.color           = 0xffffff90; 
-	mCarousel.infoBarColor    = 0x909090ff;		
+	mCarousel.color           = 0xFFFFFFFF; 
+	mCarousel.infoBarColor    = 0xDDDDDDFF;		
 	mCarousel.logoScale       = 1.5f;
-	mCarousel.logoSizeX       = 0.15f * mSize.y();
-	mCarousel.logoSizeY		  = 0.2f * mSize.y();
+	mCarousel.logoSizeX       = 0.25f * mSize.y();
+	mCarousel.logoSizeY		  = 0.155f * mSize.y();
 	mCarousel.maxLogoCount    = 3;
 	std::string  fpath        = Font::getDefaultPath();
 	float        fsize        = 0.035f;
@@ -320,12 +320,9 @@ void  SystemView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
 	mCarousel.logoSpacingX = (mSize.x() - (mCarousel.logoSizeX * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
 	mSystemInfo.setFont(Font::get((int)(fsize * mSize.y()), fpath));
 	mSystemInfo.setColor(fcolor);
-
-	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*1.5f);
+	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*2.2f);
 	mSystemInfo.setPosition(0, (mCarousel.ypos + mCarousel.height));
-	
-	LOG(LogDebug) << "SystemView::onThemeChanged():end";
-}
+	}
 
 // Render system carousel
 void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
