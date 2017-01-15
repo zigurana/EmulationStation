@@ -93,16 +93,15 @@ std::map< std::string, ElementMapType > ThemeData::sElementMap = boost::assign::
 		("showSnapshotDelay", BOOLEAN)))
 	("systemcarousel", makeMap(boost::assign::map_list_of
 		("height", FLOAT)
-		("ypos", FLOAT)
+		("yPos", FLOAT)
 		("color", COLOR)
-		("infobarcolor", COLOR)
-		("infobarfontcolor", COLOR)
-		("infobarfontpath", PATH)
-		("infobarfontsize", FLOAT)
-		("logoscale", FLOAT)
-		("logosizex", FLOAT)
-		("logosizey", FLOAT)
-		("maxlogocount", FLOAT)));
+		("infoBarColor", COLOR)
+		("infoBarFontcolor", COLOR)
+		("infoBarFontPath", PATH)
+		("infoBarFontSize", FLOAT)
+		("logoScale", FLOAT)
+		("logoSize", NORMALIZED_PAIR)
+		("maxLogoCount", FLOAT)));
 
 namespace fs = boost::filesystem;
 

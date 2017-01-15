@@ -19,16 +19,14 @@ struct SystemViewData
 
 struct SystemViewCarousel
 {
-	float ypos; 
+	float yPos; 
 	float height;
 	float logoScale;
-	float logoSpacingX;
-	float logoSpacingY;
+	Eigen::Vector2f logoSpacing;
 	unsigned int color;
 	unsigned int infoBarColor;
 	int maxLogoCount;  // maximum number of logos shown on the carousel
-	float logoSizeX;
-	float logoSizeY;
+	Eigen::Vector2f logoSize;
 	std::shared_ptr<Font> infoBarFont;
 };
 

@@ -38,17 +38,17 @@ void SystemView::populate()
 		if(theme->getElement("system", "logo", "image"))
 		{
 			ImageComponent* logo = new ImageComponent(mWindow);
-			logo->setMaxSize(Eigen::Vector2f(mCarousel.logoSizeX, mCarousel.logoSizeY));
+			logo->setMaxSize(Eigen::Vector2f(mCarousel.logoSize.x(), mCarousel.logoSize.y()));
 			logo->applyTheme((*it)->getTheme(), "system", "logo", ThemeFlags::PATH);
-			logo->setPosition((mCarousel.logoSizeX - logo->getSize().x()) / 2,
-				              (mCarousel.logoSizeY - logo->getSize().y()) / 2); // center
+			logo->setPosition((mCarousel.logoSize.x() - logo->getSize().x()) / 2,
+				              (mCarousel.logoSize.y() - logo->getSize().y()) / 2); // center
 			e.data.logo = std::shared_ptr<GuiComponent>(logo);
 
 			ImageComponent* logoSelected = new ImageComponent(mWindow);
-			logoSelected->setMaxSize(Eigen::Vector2f(mCarousel.logoSizeX * mCarousel.logoScale, mCarousel.logoSizeY * mCarousel.logoScale));
+			logoSelected->setMaxSize(Eigen::Vector2f(mCarousel.logoSize.x() * mCarousel.logoScale, mCarousel.logoSize.y() * mCarousel.logoScale));
 			logoSelected->applyTheme((*it)->getTheme(), "system", "logo", ThemeFlags::PATH);
-			logoSelected->setPosition((mCarousel.logoSizeX - logoSelected->getSize().x()) / 2,
-									  (mCarousel.logoSizeY - logoSelected->getSize().y()) / 2); // center
+			logoSelected->setPosition((mCarousel.logoSize.x()- logoSelected->getSize().x()) / 2,
+									  (mCarousel.logoSize.y() - logoSelected->getSize().y()) / 2); // center
 			e.data.logoSelected = std::shared_ptr<GuiComponent>(logoSelected);
 		}else{
 			// no logo in theme; use text
@@ -62,8 +62,7 @@ void SystemView::populate()
 
 			TextComponent* textSelected = new TextComponent(mWindow, 
 				(*it)->getName(), 
-					//Font::get((int)(FONT_SIZE_LARGE * SELECTED_SCALE)),
-					Font::get((int)(FONT_SIZE_LARGE * 1.5)),
+				Font::get((int)(FONT_SIZE_LARGE * 1.5)),
 				0x000000FF, 
 				ALIGN_CENTER);
 			textSelected->setSize(logoSize());
@@ -280,48 +279,49 @@ void  SystemView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
 
 	// set up defaults
 	mCarousel.height          = 0.2f * mSize.y();
-	mCarousel.ypos            = 0.5f * (mSize.y() - mCarousel.height); // default is centered
+	mCarousel.yPos            = 0.5f * (mSize.y() - mCarousel.height); // default is centered
 	mCarousel.color           = 0xFFFFFFFF; 
 	mCarousel.infoBarColor    = 0xDDDDDDFF;		
 	mCarousel.logoScale       = 1.5f;
-	mCarousel.logoSizeX       = 0.25f * mSize.y();
-	mCarousel.logoSizeY		  = 0.155f * mSize.y();
+	mCarousel.logoSize.x()    = 0.25f * mSize.y();
+	mCarousel.logoSize.y()	  = 0.155f * mSize.y();
 	mCarousel.maxLogoCount    = 3;
 	std::string  fpath        = Font::getDefaultPath();
 	float        fsize        = 0.035f;
 	unsigned int fcolor       = 0x000000ff;
 
-	const ThemeData::ThemeElement* elem = theme->getElement("system", "carousel", "systemcarousel");
+	const ThemeData::ThemeElement* elem = theme->getElement("system", "carousel", "systemCarousel");
 	if(elem)
 	{
 		if (elem->has("height"))
 			mCarousel.height = elem->get<float>("height") * mSize.y();
-		if (elem->has("ypos"))
-			mCarousel.ypos = elem->get<float>("ypos") * mSize.y();
+		if (elem->has("yPos"))
+			mCarousel.yPos = elem->get<float>("yPos") * mSize.y();
 		if (elem->has("color"))
 			mCarousel.color = elem->get<unsigned int>("color");
-		if (elem->has("infobarcolor"))
-			mCarousel.infoBarColor = elem->get<unsigned int>("infobarcolor");
-		if (elem->has("logoscale"))
-			mCarousel.logoScale = elem->get<float>("logoscale");
-		if (elem->has("logosizex"))
-			mCarousel.logoSizeX = elem->get<float>("logosizex") * mSize.y();
-		if (elem->has("logosizey"))
-			mCarousel.logoSizeY = elem->get<float>("logosizey") * mSize.y();
-		if (elem->has("maxlogocount"))
-			mCarousel.maxLogoCount = std::round(elem->get<float>("maxlogocount"));
-		if (elem->has("infobarfontpath"))
-			fpath = elem->get<std::string>("infobarfontpath");
-		if (elem->has("infobarfontsize"))
-			fsize = elem->get<float>("infobarfontsize");
-		if (elem->has("infobarfontcolor"))
-			fcolor = elem->get<unsigned int>("infobarfontcolor");
+		if (elem->has("infoBarColor"))
+			mCarousel.infoBarColor = elem->get<unsigned int>("infoBarColor");
+		if (elem->has("logoScale"))
+			mCarousel.logoScale = elem->get<float>("logoScale");
+		if (elem->has("logoSize")) {
+			Eigen::Vector2f temp = elem->get<Eigen::Vector2f>("logoSize");
+			mCarousel.logoSize.x() = temp.x()*mSize.x();
+			mCarousel.logoSize.y() = temp.y()*mSize.y();
+		}
+		if (elem->has("maxLogoCount"))
+			mCarousel.maxLogoCount = std::round(elem->get<float>("maxLogoCount"));
+		if (elem->has("infoBarFontPath"))
+			fpath = elem->get<std::string>("infoBarFontPath");
+		if (elem->has("infoBarFontSize"))
+			fsize = elem->get<float>("infoBarFontSize");
+		if (elem->has("infoBarFontColor"))
+			fcolor = elem->get<unsigned int>("infoBarFontColor");
 	}
-	mCarousel.logoSpacingX = (mSize.x() - (mCarousel.logoSizeX * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
+	mCarousel.logoSpacing.x() = (mSize.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
 	mSystemInfo.setFont(Font::get((int)(fsize * mSize.y()), fpath));
 	mSystemInfo.setColor(fcolor);
 	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*2.2f);
-	mSystemInfo.setPosition(0, (mCarousel.ypos + mCarousel.height));
+	mSystemInfo.setPosition(0, (mCarousel.yPos + mCarousel.height));
 	}
 
 // Render system carousel
@@ -334,11 +334,11 @@ void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
 
 	// background behind the logos <- Caroussel
 	Renderer::setMatrix(trans);
-	Renderer::drawRect(0.f, mCarousel.ypos, mSize.x(), mCarousel.height, mCarousel.color);
+	Renderer::drawRect(0.f, mCarousel.yPos, mSize.x(), mCarousel.height, mCarousel.color);
 
 	// draw logos
-	float xOff = (mSize.x() - mCarousel.logoSizeX) / 2 - (mCamOffset * (mCarousel.logoSizeX + mCarousel.logoSpacingX));
-	float yOff = mCarousel.ypos + (mCarousel.height / 2) - (mCarousel.logoSizeY / 2);
+	float xOff = (mSize.x() - mCarousel.logoSize.x()) / 2 - (mCamOffset * (mCarousel.logoSize.x() + mCarousel.logoSpacing.x()));
+	float yOff = mCarousel.yPos + (mCarousel.height / 2) - (mCarousel.logoSize.y() / 2);
 	Eigen::Affine3f logoTrans = trans;
 
 	int center = (int)(mCamOffset);
@@ -350,7 +350,7 @@ void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
 		while (index >= (int)mEntries.size())
 			index -= mEntries.size();
 
-		logoTrans.translation() = trans.translation() + Eigen::Vector3f(i * (mCarousel.logoSizeX + mCarousel.logoSpacingX) + xOff, yOff, 0);
+		logoTrans.translation() = trans.translation() + Eigen::Vector3f(i * (mCarousel.logoSize.x() + mCarousel.logoSpacing.x()) + xOff, yOff, 0);
 
 		if (index == mCursor) //scale our selection up
 		{
