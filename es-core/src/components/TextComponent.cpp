@@ -12,11 +12,12 @@ TextComponent::TextComponent(Window* window) : GuiComponent(window),
 }
 
 TextComponent::TextComponent(Window* window, const std::string& text, const std::shared_ptr<Font>& font, unsigned int color, Alignment align,
-	Eigen::Vector3f pos, Eigen::Vector2f size) : GuiComponent(window), 
-	mFont(NULL), mUppercase(false), mColor(0x000000FF), mAutoCalcExtent(true, true), mAlignment(align), mLineSpacing(1.5f)
+	Eigen::Vector3f pos, Eigen::Vector2f size, unsigned int bgcolor) : GuiComponent(window), 
+	mFont(NULL), mUppercase(false), mColor(0x000000FF), mAutoCalcExtent(true, true), mAlignment(align), mLineSpacing(1.5f), mBgColor(NULL)
 {
 	setFont(font);
 	setColor(color);
+	setBackgroundColor(bgcolor);
 	setText(text);
 	setPosition(pos);
 	setSize(size);
@@ -42,6 +43,11 @@ void TextComponent::setColor(unsigned int color)
 	GuiComponent::setOpacity(opacity);
 
 	onColorChanged();
+}
+
+void TextComponent::setBackgroundColor(unsigned int color)
+{
+	mBgColor = color;
 }
 
 void TextComponent::setOpacity(unsigned char opacity)
@@ -79,26 +85,33 @@ void TextComponent::render(const Eigen::Affine3f& parentTrans)
 		Eigen::Vector2i((int)(dim.x() + 0.5f), (int)(dim.y() + 0.5f)));
 		*/
 
-	if(mTextCache)
+	if (mBgColor) // if mBgColor is set
+	{
+		Renderer::drawRect(getPosition().x(), getPosition().y() - 1,
+			//getSize().x(), getSize().y(), mBgColor | (unsigned char)(getOpacity() / 255.f));
+			getSize().x(), getSize().y(), mBgColor);
+	}
+
+	if (mTextCache)
 	{
 		const Eigen::Vector2f& textSize = mTextCache->metrics.size;
 		Eigen::Vector3f off(0, (getSize().y() - textSize.y()) / 2.0f, 0);
 
-		if(Settings::getInstance()->getBool("DebugText"))
+		if (Settings::getInstance()->getBool("DebugText"))
 		{
 			// draw the "textbox" area, what we are aligned within
 			Renderer::setMatrix(trans);
 			Renderer::drawRect(0.f, 0.f, mSize.x(), mSize.y(), 0xFF000033);
 		}
-		
+
 		trans.translate(off);
 		trans = roundMatrix(trans);
 		Renderer::setMatrix(trans);
 
 		// draw the text area, where the text actually is going
-		if(Settings::getInstance()->getBool("DebugText"))
+		if (Settings::getInstance()->getBool("DebugText"))
 		{
-			switch(mAlignment)
+			switch (mAlignment)
 			{
 			case ALIGN_LEFT:
 				Renderer::drawRect(0.0f, 0.0f, mTextCache->metrics.size.x(), mTextCache->metrics.size.y(), 0x00000033);
@@ -111,9 +124,9 @@ void TextComponent::render(const Eigen::Affine3f& parentTrans)
 				break;
 			}
 		}
-
 		mFont->renderTextCache(mTextCache.get());
 	}
+	
 
 	//Renderer::popClipRect();
 }
@@ -216,8 +229,11 @@ void TextComponent::applyTheme(const std::shared_ptr<ThemeData>& theme, const st
 	if(!elem)
 		return;
 
-	if(properties & COLOR && elem->has("color"))
-		setColor(elem->get<unsigned int>("color"));
+	if (properties & COLOR && elem->has("color"))
+		setColor(elem->get<unsigned int>("color"));	
+
+	if (properties & COLOR && elem->has("backgroundColor"))
+		setBackgroundColor(elem->get<unsigned int>("backgroundColor"));
 
 	if(properties & ALIGNMENT && elem->has("alignment"))
 	{

@@ -10,7 +10,8 @@
 #include "Util.h"
 
 SystemView::SystemView(Window* window) : IList<SystemViewData, SystemData*>(window, LIST_SCROLL_STYLE_SLOW, LIST_ALWAYS_LOOP),
-	mSystemInfo(window, "SYSTEM INFO", Font::get(FONT_SIZE_SMALL), 0x33333300, ALIGN_CENTER)
+										 mViewNeedsReload(true),
+										 mSystemInfo(window, "SYSTEM INFO", Font::get(FONT_SIZE_SMALL), 0x33333300, ALIGN_CENTER)
 {
 	mCamOffset = 0;
 	mExtrasCamOffset = 0;
@@ -28,7 +29,9 @@ void SystemView::populate()
 	{
 		const std::shared_ptr<ThemeData>& theme = (*it)->getTheme();
 
-		onThemeChanged(theme);
+		// to prevent recurrent loading of the same carousel and sysinfo data, check if needed.
+		if(mViewNeedsReload)
+			getViewElements(theme);
 
 		Entry e;
 		e.name = (*it)->getName();
@@ -57,7 +60,7 @@ void SystemView::populate()
 				Font::get(FONT_SIZE_LARGE), 
 				0x000000FF, 
 				ALIGN_CENTER);
-			text->setSize(logoSize());
+			text->setSize(mCarousel.logoSize);
 			e.data.logo = std::shared_ptr<GuiComponent>(text);
 
 			TextComponent* textSelected = new TextComponent(mWindow, 
@@ -65,7 +68,7 @@ void SystemView::populate()
 				Font::get((int)(FONT_SIZE_LARGE * 1.5)),
 				0x000000FF, 
 				ALIGN_CENTER);
-			textSelected->setSize(logoSize());
+			textSelected->setSize(mCarousel.logoSize);
 			e.data.logoSelected = std::shared_ptr<GuiComponent>(textSelected);
 		}
 
@@ -271,58 +274,30 @@ HelpStyle SystemView::getHelpStyle()
 }
 
 
-// It would be cleanest if this function handles all theme-related actions,
-// but for now, it just sets the struct for the carousel parameters.
+
 void  SystemView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
 {
 	LOG(LogDebug) << "SystemView::onThemeChanged()";
+	mViewNeedsReload = true;
+	populate();
+}
 
-	// set up defaults
-	mCarousel.height          = 0.2f * mSize.y();
-	mCarousel.yPos            = 0.5f * (mSize.y() - mCarousel.height); // default is centered
-	mCarousel.color           = 0xFFFFFFFF; 
-	mCarousel.infoBarColor    = 0xDDDDDDFF;		
-	mCarousel.logoScale       = 1.5f;
-	mCarousel.logoSize.x()    = 0.25f * mSize.y();
-	mCarousel.logoSize.y()	  = 0.155f * mSize.y();
-	mCarousel.maxLogoCount    = 3;
-	std::string  fpath        = Font::getDefaultPath();
-	float        fsize        = 0.035f;
-	unsigned int fcolor       = 0x000000ff;
+void  SystemView::getViewElements(const std::shared_ptr<ThemeData>& theme)
+{
+	LOG(LogDebug) << "SystemView::getViewElements()";
 
-	const ThemeData::ThemeElement* elem = theme->getElement("system", "carousel", "systemCarousel");
-	if(elem)
-	{
-		if (elem->has("height"))
-			mCarousel.height = elem->get<float>("height") * mSize.y();
-		if (elem->has("yPos"))
-			mCarousel.yPos = elem->get<float>("yPos") * mSize.y();
-		if (elem->has("color"))
-			mCarousel.color = elem->get<unsigned int>("color");
-		if (elem->has("infoBarColor"))
-			mCarousel.infoBarColor = elem->get<unsigned int>("infoBarColor");
-		if (elem->has("logoScale"))
-			mCarousel.logoScale = elem->get<float>("logoScale");
-		if (elem->has("logoSize")) {
-			Eigen::Vector2f temp = elem->get<Eigen::Vector2f>("logoSize");
-			mCarousel.logoSize.x() = temp.x()*mSize.x();
-			mCarousel.logoSize.y() = temp.y()*mSize.y();
-		}
-		if (elem->has("maxLogoCount"))
-			mCarousel.maxLogoCount = std::round(elem->get<float>("maxLogoCount"));
-		if (elem->has("infoBarFontPath"))
-			fpath = elem->get<std::string>("infoBarFontPath");
-		if (elem->has("infoBarFontSize"))
-			fsize = elem->get<float>("infoBarFontSize");
-		if (elem->has("infoBarFontColor"))
-			fcolor = elem->get<unsigned int>("infoBarFontColor");
-	}
-	mCarousel.logoSpacing.x() = (mSize.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
-	mSystemInfo.setFont(Font::get((int)(fsize * mSize.y()), fpath));
-	mSystemInfo.setColor(fcolor);
-	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*2.2f);
-	mSystemInfo.setPosition(0, (mCarousel.yPos + mCarousel.height));
-	}
+	getDefaultElements();
+
+	const ThemeData::ThemeElement* carouselElem = theme->getElement("system", "systemcarousel", "carousel");
+	if (carouselElem)
+		getCarouselFromTheme(carouselElem);
+
+	const ThemeData::ThemeElement* sysInfoElem = theme->getElement("system", "systemInfo", "text");
+	if (sysInfoElem)
+		mSystemInfo.applyTheme(theme, "system", "systemInfo", ThemeFlags::ALL);
+
+	mViewNeedsReload = false;
+}
 
 // Render system carousel
 void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
@@ -330,15 +305,17 @@ void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
 	Eigen::Affine3f trans = getTransform() * parentTrans;
 
 	// Get number of logo's in caroussel
-	int logoCount = std::min(mCarousel.maxLogoCount, (int)mEntries.size());
+	int logoCount = std::min(mCarousel.maxLogoCount +2, (int)mEntries.size());
 
 	// background behind the logos <- Caroussel
 	Renderer::setMatrix(trans);
-	Renderer::drawRect(0.f, mCarousel.yPos, mSize.x(), mCarousel.height, mCarousel.color);
+	Renderer::drawRect(0.f, mCarousel.pos.y(), mSize.x(), mCarousel.size.y(), mCarousel.color);
 
 	// draw logos
-	float xOff = (mSize.x() - mCarousel.logoSize.x()) / 2 - (mCamOffset * (mCarousel.logoSize.x() + mCarousel.logoSpacing.x()));
-	float yOff = mCarousel.yPos + (mCarousel.height / 2) - (mCarousel.logoSize.y() / 2);
+	float logoSpacingX = (mCarousel.size.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
+
+	float xOff = (mSize.x() - mCarousel.logoSize.x()) / 2 - (mCamOffset * (mCarousel.logoSize.x() + logoSpacingX));
+	float yOff = mCarousel.pos.y() + (mCarousel.size.y() / 2) - (mCarousel.logoSize.y() / 2);
 	Eigen::Affine3f logoTrans = trans;
 
 	int center = (int)(mCamOffset);
@@ -350,7 +327,7 @@ void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
 		while (index >= (int)mEntries.size())
 			index -= mEntries.size();
 
-		logoTrans.translation() = trans.translation() + Eigen::Vector3f(i * (mCarousel.logoSize.x() + mCarousel.logoSpacing.x()) + xOff, yOff, 0);
+		logoTrans.translation() = trans.translation() + Eigen::Vector3f(i * (mCarousel.logoSize.x() + logoSpacingX) + xOff, yOff, 0);
 
 		if (index == mCursor) //scale our selection up
 		{
@@ -369,9 +346,6 @@ void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
 
 	// Finally, render systeminfo bar and text
 	Renderer::setMatrix(trans);
-	Renderer::drawRect(mSystemInfo.getPosition().x(), mSystemInfo.getPosition().y() - 1,
-					mSize.x(), mSystemInfo.getSize().y(),
-					mCarousel.infoBarColor | (unsigned char)(mSystemInfo.getOpacity() / 255.f));
 	mSystemInfo.render(trans);
 }
 
@@ -403,4 +377,42 @@ void SystemView::renderExtras(const Eigen::Affine3f& parentTrans)
 		Renderer::setMatrix(trans);
 		Renderer::drawRect(0.0f, 0.0f, mSize.x(), mSize.y(), 0x00000000 | (unsigned char)(mExtrasFadeOpacity * 255));
 	}
+}
+
+// Populate the system carousel with the legacy values
+void  SystemView::getDefaultElements(void)
+{
+	// Carousel
+	mCarousel.size.x() = mSize.x();
+	mCarousel.size.y() = 0.2f * mSize.y();
+	mCarousel.pos.y() = 0.5f * (mSize.y() - mCarousel.size.y()); // default is centered
+	mCarousel.color = 0xFFFFFFFF;
+	mCarousel.logoScale = 1.5f;
+	mCarousel.logoSize.x() = 0.25f * mSize.x();
+	mCarousel.logoSize.y() = 0.155f * mSize.y();
+	mCarousel.maxLogoCount = 3;
+
+	// System Info Bar
+	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*2.2f);
+	mSystemInfo.setPosition(0, (mCarousel.pos.y() + mCarousel.size.y()));
+	mSystemInfo.setBackgroundColor(0xDDDDDDFF);
+	mSystemInfo.setFont(Font::get((int)(0.035f * mSize.y()),
+						Font::getDefaultPath()));
+	mSystemInfo.setColor(0x000000ff);
+}
+
+void SystemView::getCarouselFromTheme(const ThemeData::ThemeElement* elem)
+{
+	if (elem->has("size"))
+		mCarousel.size = elem->get<Eigen::Vector2f>("size").cwiseProduct(mSize);
+	if (elem->has("pos"))
+		mCarousel.pos = elem->get<Eigen::Vector2f>("pos").cwiseProduct(mSize);
+	if (elem->has("color"))
+		mCarousel.color = elem->get<unsigned int>("color");
+	if (elem->has("logoScale"))
+		mCarousel.logoScale = elem->get<float>("logoScale");
+	if (elem->has("logoSize"))
+		mCarousel.logoSize = elem->get<Eigen::Vector2f>("logoSize").cwiseProduct(mSize);
+	if (elem->has("maxLogoCount"))
+		mCarousel.maxLogoCount = std::round(elem->get<float>("maxLogoCount"));
 }

@@ -19,15 +19,13 @@ struct SystemViewData
 
 struct SystemViewCarousel
 {
-	float yPos; 
-	float height;
-	float logoScale;
+	Eigen::Vector2f pos;
+	Eigen::Vector2f size;
+	float			logoScale;
 	Eigen::Vector2f logoSpacing;
-	unsigned int color;
-	unsigned int infoBarColor;
-	int maxLogoCount;  // maximum number of logos shown on the carousel
+	unsigned int	color;
+	int				maxLogoCount;  // maximum number of logos shown on the carousel
 	Eigen::Vector2f logoSize;
-	std::shared_ptr<Font> infoBarFont;
 };
 
 class SystemView : public IList<SystemViewData, SystemData*>
@@ -52,15 +50,19 @@ protected:
 	void onCursorChanged(const CursorState& state) override;
 
 private:
-	inline Eigen::Vector2f logoSize() const { return Eigen::Vector2f(mSize.x() * 0.10f, mSize.y() * 0.155f); }
-
 	void populate();
+	void getViewElements(const std::shared_ptr<ThemeData>& theme);
+	void getDefaultElements(void);
+	void getCarouselFromTheme(const ThemeData::ThemeElement* elem);
+	//void getInfoBarFromTheme(const ThemeData::ThemeElement* elem);
 
-	TextComponent mSystemInfo;
 	SystemViewCarousel mCarousel;
+	TextComponent mSystemInfo;
 
 	// unit is list index
 	float mCamOffset;
 	float mExtrasCamOffset;
 	float mExtrasFadeOpacity;
+
+	bool mViewNeedsReload;
 };
