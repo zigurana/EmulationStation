@@ -17,8 +17,6 @@
 #include "components/OptionListComponent.h"
 #include "components/MenuComponent.h"
 #include "VolumeControl.h"
-#include "scrapers/GamesDBScraper.h"
-#include "scrapers/TheArchiveScraper.h"
 
 GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MENU"), mVersion(window)
 {
@@ -179,6 +177,12 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 			parse_gamelists->setState(Settings::getInstance()->getBool("ParseGamelistOnly"));
 			s->addWithLabel("PARSE GAMESLISTS ONLY", parse_gamelists);
 			s->addSaveFunc([parse_gamelists] { Settings::getInstance()->setBool("ParseGamelistOnly", parse_gamelists->getState()); });
+
+			// maximum vram
+			auto max_vram = std::make_shared<SliderComponent>(mWindow, 0.f, 1000.f, 10.f, "Mb");
+			max_vram->setValue((float)(Settings::getInstance()->getInt("MaxVRAM")));
+			s->addWithLabel("VRAM LIMIT", max_vram);
+			s->addSaveFunc([max_vram] { Settings::getInstance()->setInt("MaxVRAM", (int)round(max_vram->getValue())); });
 
 			mWindow->pushGui(s);
 	});
