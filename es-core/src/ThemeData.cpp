@@ -94,6 +94,7 @@ std::map< std::string, ElementMapType > ThemeData::sElementMap = boost::assign::
 		("showSnapshotNoVideo", BOOLEAN)
 		("showSnapshotDelay", BOOLEAN)))
 	("carousel", makeMap(boost::assign::map_list_of
+		("type", STRING)
 		("size", NORMALIZED_PAIR)
 		("pos", NORMALIZED_PAIR)
 		("color", COLOR)

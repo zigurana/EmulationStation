@@ -49,8 +49,8 @@ void SystemView::populate()
 
 			ImageComponent* logoSelected = new ImageComponent(mWindow);
 			logoSelected->setMaxSize(Eigen::Vector2f(mCarousel.logoSize.x() * mCarousel.logoScale, mCarousel.logoSize.y() * mCarousel.logoScale));
-			logoSelected->applyTheme((*it)->getTheme(), "system", "logo", ThemeFlags::PATH);
-			logoSelected->setPosition((mCarousel.logoSize.x()- logoSelected->getSize().x()) / 2,
+			logoSelected->applyTheme((*it)->getTheme(), "system", "logo", ThemeFlags::PATH | ThemeFlags::COLOR);
+			logoSelected->setPosition((mCarousel.logoSize.x() - logoSelected->getSize().x()) / 2,
 									  (mCarousel.logoSize.y() - logoSelected->getSize().y()) / 2); // center
 			e.data.logoSelected = std::shared_ptr<GuiComponent>(logoSelected);
 		}else{
@@ -304,21 +304,18 @@ void SystemView::renderCarousel(const Eigen::Affine3f& parentTrans)
 {
 	Eigen::Affine3f trans = getTransform() * parentTrans;
 
-	// Get number of logo's in caroussel
-	int logoCount = std::min(mCarousel.maxLogoCount +2, (int)mEntries.size());
-
-	// background behind the logos <- Caroussel
+	// background box behind logos
 	Renderer::setMatrix(trans);
-	Renderer::drawRect(0.f, mCarousel.pos.y(), mSize.x(), mCarousel.size.y(), mCarousel.color);
+	Renderer::drawRect(mCarousel.pos.x(), mCarousel.pos.y(), mCarousel.size.x(), mCarousel.size.y(), mCarousel.color);
 
 	// draw logos
-	float logoSpacingX = (mCarousel.size.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
-
+	float logoSpacingX = (mSize.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount);
+	Eigen::Affine3f logoTrans = trans;
+	int center = (int)(mCamOffset);
+	int logoCount = std::min(mCarousel.maxLogoCount + 2, (int)mEntries.size());
 	float xOff = (mSize.x() - mCarousel.logoSize.x()) / 2 - (mCamOffset * (mCarousel.logoSize.x() + logoSpacingX));
 	float yOff = mCarousel.pos.y() + (mCarousel.size.y() / 2) - (mCarousel.logoSize.y() / 2);
-	Eigen::Affine3f logoTrans = trans;
 
-	int center = (int)(mCamOffset);
 	for (int i = center - logoCount / 2; i < center + logoCount / 2 + 1; i++)
 	{
 		int index = i;
