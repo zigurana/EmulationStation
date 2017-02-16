@@ -10,6 +10,12 @@
 class SystemData;
 class AnimatedImageComponent;
 
+enum CarouselType : unsigned int
+{
+	HORIZONTAL = 0,
+	VERTICAL = 1
+};
+
 struct SystemViewData
 {
 	std::shared_ptr<GuiComponent> logo;
@@ -19,6 +25,7 @@ struct SystemViewData
 
 struct SystemViewCarousel
 {
+	CarouselType	type;
 	Eigen::Vector2f pos;
 	Eigen::Vector2f size;
 	float			logoScale;
@@ -38,8 +45,6 @@ public:
 	bool input(InputConfig* config, Input input) override;
 	void update(int deltaTime) override;
 	void render(const Eigen::Affine3f& parentTrans) override;
-	void renderCarousel(const Eigen::Affine3f& parentTrans);
-	void renderExtras(const Eigen::Affine3f& parentTrans);
 
 	void onThemeChanged(const std::shared_ptr<ThemeData>& theme);
 
@@ -54,7 +59,10 @@ private:
 	void getViewElements(const std::shared_ptr<ThemeData>& theme);
 	void getDefaultElements(void);
 	void getCarouselFromTheme(const ThemeData::ThemeElement* elem);
-	//void getInfoBarFromTheme(const ThemeData::ThemeElement* elem);
+
+	void renderCarousel(const Eigen::Affine3f& parentTrans);
+	void renderExtras(const Eigen::Affine3f& parentTrans);
+	void renderInfoBar(const Eigen::Affine3f& trans);
 
 	SystemViewCarousel mCarousel;
 	TextComponent mSystemInfo;
