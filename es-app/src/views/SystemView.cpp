@@ -345,13 +345,13 @@ void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 	switch (mCarousel.type)
 	{
 		case VERTICAL:
-			logoSpacing[1] = ((mSize.y() - (mCarousel.logoSize.y() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.y();
+			logoSpacing[1] = ((mCarousel.size.y() - (mCarousel.logoSize.y() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.y();
 			xOff = mCarousel.pos.x() + (mCarousel.size.x() / 2) - (mCarousel.logoSize.x() / 2);
 			yOff = (mSize.y() - mCarousel.logoSize.y()) / 2 - (mCamOffset * logoSpacing[1]);
 			break;
 		case HORIZONTAL:
 		default:
-			logoSpacing[0] = ((mSize.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.x();
+			logoSpacing[0] = ((mCarousel.size.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.x();
 			xOff = (mSize.x() - mCarousel.logoSize.x()) / 2 - (mCamOffset * logoSpacing[0]);
 			yOff = mCarousel.pos.y() + (mCarousel.size.y() / 2) - (mCarousel.logoSize.y() / 2);
 			break;
