@@ -327,6 +327,11 @@ void  SystemView::getViewElements(const std::shared_ptr<ThemeData>& theme)
 // Render system carousel
 void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 {
+	Eigen::Vector2i clipPos((int)mCarousel.pos.x(), (int)mCarousel.pos.y());
+	Eigen::Vector2i clipSize((int)mCarousel.size.x(), (int)mCarousel.size.y());
+
+	Renderer::pushClipRect(clipPos, clipSize);
+
 	// background box behind logos
 	Renderer::setMatrix(trans);
 	Renderer::drawRect(mCarousel.pos.x(), mCarousel.pos.y(), mCarousel.size.x(), mCarousel.size.y(), mCarousel.color);
@@ -381,6 +386,8 @@ void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 			comp->render(logoTrans);
 		}
 	}
+
+	Renderer::popClipRect();
 }
 
 void SystemView::renderInfoBar(const Eigen::Affine3f& trans)
@@ -424,7 +431,8 @@ void  SystemView::getDefaultElements(void)
 	// Carousel
 	mCarousel.type = HORIZONTAL;
 	mCarousel.size.x() = mSize.x();
-	mCarousel.size.y() = 0.2f * mSize.y();
+	mCarousel.size.y() = 0.2325f * mSize.y();
+	mCarousel.pos.x() = 0.0f;
 	mCarousel.pos.y() = 0.5f * (mSize.y() - mCarousel.size.y()); // default is centered
 	mCarousel.color = 0xFFFFFFFF;
 	mCarousel.logoScale = 1.5f;
