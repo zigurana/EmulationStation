@@ -327,6 +327,11 @@ void  SystemView::getViewElements(const std::shared_ptr<ThemeData>& theme)
 // Render system carousel
 void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 {
+	Eigen::Vector2i clipPos((int)mCarousel.pos.x(), (int)mCarousel.pos.y());
+	Eigen::Vector2i clipSize((int)mCarousel.size.x(), (int)mCarousel.size.y());
+
+	Renderer::pushClipRect(clipPos, clipSize);
+
 	// background box behind logos
 	Renderer::setMatrix(trans);
 	Renderer::drawRect(mCarousel.pos.x(), mCarousel.pos.y(), mCarousel.size.x(), mCarousel.size.y(), mCarousel.color);
@@ -340,13 +345,13 @@ void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 	switch (mCarousel.type)
 	{
 		case VERTICAL:
-			logoSpacing[1] = ((mSize.y() - (mCarousel.logoSize.y() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.y();
+			logoSpacing[1] = ((mCarousel.size.y() - (mCarousel.logoSize.y() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.y();
 			xOff = mCarousel.pos.x() + (mCarousel.size.x() / 2) - (mCarousel.logoSize.x() / 2);
 			yOff = (mSize.y() - mCarousel.logoSize.y()) / 2 - (mCamOffset * logoSpacing[1]);
 			break;
 		case HORIZONTAL:
 		default:
-			logoSpacing[0] = ((mSize.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.x();
+			logoSpacing[0] = ((mCarousel.size.x() - (mCarousel.logoSize.x() * mCarousel.maxLogoCount)) / (mCarousel.maxLogoCount)) + mCarousel.logoSize.x();
 			xOff = (mSize.x() - mCarousel.logoSize.x()) / 2 - (mCamOffset * logoSpacing[0]);
 			yOff = mCarousel.pos.y() + (mCarousel.size.y() / 2) - (mCarousel.logoSize.y() / 2);
 			break;
@@ -354,7 +359,7 @@ void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 
 	Eigen::Affine3f logoTrans = trans;
 	int center = (int)(mCamOffset);
-	int logoCount = std::min(mCarousel.maxLogoCount + 2, (int)mEntries.size());
+	int logoCount = std::min(mCarousel.maxLogoCount, (int)mEntries.size()) + 2;
 
 	for (int i = center - logoCount / 2; i < center + logoCount / 2 + 1; i++)
 	{
@@ -381,6 +386,8 @@ void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 			comp->render(logoTrans);
 		}
 	}
+
+	Renderer::popClipRect();
 }
 
 void SystemView::renderInfoBar(const Eigen::Affine3f& trans)
@@ -424,7 +431,8 @@ void  SystemView::getDefaultElements(void)
 	// Carousel
 	mCarousel.type = HORIZONTAL;
 	mCarousel.size.x() = mSize.x();
-	mCarousel.size.y() = 0.2f * mSize.y();
+	mCarousel.size.y() = 0.2325f * mSize.y();
+	mCarousel.pos.x() = 0.0f;
 	mCarousel.pos.y() = 0.5f * (mSize.y() - mCarousel.size.y()); // default is centered
 	mCarousel.color = 0xFFFFFFFF;
 	mCarousel.logoScale = 1.5f;
