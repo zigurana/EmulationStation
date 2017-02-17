@@ -359,7 +359,7 @@ void SystemView::renderCarousel(const Eigen::Affine3f& trans)
 
 	Eigen::Affine3f logoTrans = trans;
 	int center = (int)(mCamOffset);
-	int logoCount = std::min(mCarousel.maxLogoCount + 2, (int)mEntries.size());
+	int logoCount = std::min(mCarousel.maxLogoCount, (int)mEntries.size()) + 2;
 
 	for (int i = center - logoCount / 2; i < center + logoCount / 2 + 1; i++)
 	{
