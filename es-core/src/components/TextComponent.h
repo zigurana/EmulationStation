@@ -47,6 +47,8 @@ private:
 
 	unsigned int mColor;
 	unsigned int mBgColor;
+	unsigned char mColorOpacity;
+	unsigned char mBgColorOpacity;
 
 	std::shared_ptr<Font> mFont;
 	bool mUppercase;

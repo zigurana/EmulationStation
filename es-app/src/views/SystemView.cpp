@@ -434,7 +434,7 @@ void  SystemView::getDefaultElements(void)
 	mCarousel.size.y() = 0.2325f * mSize.y();
 	mCarousel.pos.x() = 0.0f;
 	mCarousel.pos.y() = 0.5f * (mSize.y() - mCarousel.size.y()); // default is centered
-	mCarousel.color = 0xFFFFFFFF;
+	mCarousel.color = 0xFFFFFFD8;
 	mCarousel.logoScale = 1.5f;
 	mCarousel.logoSize.x() = 0.25f * mSize.x();
 	mCarousel.logoSize.y() = 0.155f * mSize.y();
@@ -443,10 +443,10 @@ void  SystemView::getDefaultElements(void)
 	// System Info Bar
 	mSystemInfo.setSize(mSize.x(), mSystemInfo.getFont()->getLetterHeight()*2.2f);
 	mSystemInfo.setPosition(0, (mCarousel.pos.y() + mCarousel.size.y()));
-	mSystemInfo.setBackgroundColor(0xDDDDDDFF);
+	mSystemInfo.setBackgroundColor(0xDDDDDDD8);
 	mSystemInfo.setFont(Font::get((int)(0.035f * mSize.y()),
 						Font::getDefaultPath()));
-	mSystemInfo.setColor(0x000000ff);
+	mSystemInfo.setColor(0x000000FF);
 }
 
 void SystemView::getCarouselFromTheme(const ThemeData::ThemeElement* elem)

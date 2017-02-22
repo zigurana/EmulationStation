@@ -39,8 +39,8 @@ void TextComponent::setColor(unsigned int color)
 {
 	mColor = color;
 
-	unsigned char opacity = mColor & 0x000000FF;
-	GuiComponent::setOpacity(opacity);
+	mColorOpacity = mColor & 0x000000FF;
+	//GuiComponent::setOpacity(mColorOpacity);
 
 	onColorChanged();
 }
@@ -48,11 +48,19 @@ void TextComponent::setColor(unsigned int color)
 void TextComponent::setBackgroundColor(unsigned int color)
 {
 	mBgColor = color;
+	mBgColorOpacity = mBgColor & 0x000000FF;
 }
 
 void TextComponent::setOpacity(unsigned char opacity)
 {
-	mColor = (mColor & 0xFFFFFF00) | opacity;
+	// assume that opacity is a relative value between 0 and 255 (expressed as uns char)
+	// so set the new opacity as this relative value of the original opacity
+	unsigned char o = (unsigned char)((float)opacity / 255.f * (float) mColorOpacity);
+	mColor = (mColor & 0xFFFFFF00) | (unsigned char) o;
+	
+	unsigned char bgo = (unsigned char)((float)opacity / 255.f * (float)mBgColorOpacity);
+	mBgColor = (mBgColor & 0xFFFFFF00) | (unsigned char)bgo;
+	
 	onColorChanged();
 
 	GuiComponent::setOpacity(opacity);
