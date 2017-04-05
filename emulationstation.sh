@@ -3,7 +3,7 @@
 esdir="$(dirname $0)"
 while true; do
     rm -f /tmp/es-restart /tmp/es-sysrestart /tmp/es-shutdown
-    "$esdir/emulationstation" "$@"
+    "emulationstation" "$@"
     [ -f /tmp/es-restart ] && continue
     if [ -f /tmp/es-sysrestart ]; then
         rm -f /tmp/es-sysrestart

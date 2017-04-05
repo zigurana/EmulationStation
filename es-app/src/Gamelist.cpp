@@ -79,6 +79,9 @@ FileData* findOrCreateFile(SystemData* system, const boost::filesystem::path& pa
 
 void parseGamelist(SystemData* system)
 {
+	if(Settings::getInstance()->getString("UIMode") != "Full" && system->getName() == "retropie")
+		return;
+
 	std::string xmlpath = system->getGamelistPath(false);
 
 	if(!boost::filesystem::exists(xmlpath))
