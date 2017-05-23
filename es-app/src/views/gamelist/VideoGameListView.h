@@ -16,7 +16,7 @@ public:
 
 	virtual void onThemeChanged(const std::shared_ptr<ThemeData>& theme) override;
 
-	virtual const char* getName() const override { return "video"; }
+	virtual const std::string getName() const override { return "video"; }
 	virtual void launch(FileData* game) override;
 
 protected:

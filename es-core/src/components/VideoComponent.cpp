@@ -127,6 +127,11 @@ bool VideoComponent::setVideo(std::string path)
 	return false;
 }
 
+void VideoComponent::setValue(const std::string& value)
+{
+	setVideo(value);
+}
+
 void VideoComponent::setImage(std::string path)
 {
 	// Check that the image has changed

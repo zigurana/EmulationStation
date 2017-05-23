@@ -10,58 +10,23 @@
 ISimpleGameListView::ISimpleGameListView(Window* window, FileData* root) : IGameListView(window, root),
 	mHeaderText(window), mHeaderImage(window), mBackground(window)
 {
-	mHeaderText.setText("Logo Text");
-	mHeaderText.setSize(mSize.x(), 0);
-	mHeaderText.setPosition(0, 0);
-	mHeaderText.setAlignment(ALIGN_CENTER);
-	mHeaderText.setDefaultZIndex(50);
-	
-	mHeaderImage.setResize(0, mSize.y() * 0.185f);
-	mHeaderImage.setOrigin(0.5f, 0.0f);
-	mHeaderImage.setPosition(mSize.x() / 2, 0);
-	mHeaderImage.setDefaultZIndex(50);
-
-	mBackground.setResize(mSize.x(), mSize.y());
-	mBackground.setDefaultZIndex(0);
-
-	addChild(&mHeaderText);
-	addChild(&mBackground);
+	// This space has been intentionally left blank.
 }
 
 void ISimpleGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
 {
-	using namespace ThemeFlags;
-	mBackground.applyTheme(theme, getName(), "background", ALL);
-	mHeaderImage.applyTheme(theme, getName(), "logo", ALL);
-	mHeaderText.applyTheme(theme, getName(), "logoText", ALL);
-
-	// Remove old theme extras
-	for (auto extra : mThemeExtras)
-	{
-		removeChild(extra);
-		delete extra;
-	}
-	mThemeExtras.clear();
-
-	// Add new theme extras
-	mThemeExtras = ThemeData::makeExtras(theme, getName(), mWindow);
-	for (auto extra : mThemeExtras)
-	{
-		addChild(extra);
-	}
-
-	if(mHeaderImage.hasImage())
-	{
-		removeChild(&mHeaderText);
-		addChild(&mHeaderImage);
-	}else{
-		addChild(&mHeaderText);
-		removeChild(&mHeaderImage);
-	}
+	// This space has been intentionally left blank.
 }
 
 void ISimpleGameListView::onFileChanged(FileData* file, FileChangeType change)
 {
+	if (change == FILE_METADATA_CHANGED)
+	{
+		// might switch to a detailed view
+		ViewController::get()->reloadGameListView(this);
+		return;
+	}
+
 	// we could be tricky here to be efficient;
 	// but this shouldn't happen very often so we'll just always repopulate
 	FileData* cursor = getCursor();
@@ -117,6 +82,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			{
 				onFocusLost();
 				ViewController::get()->goToNextGameList();
+				Sound::getFromTheme(getTheme(), getName(), "switch")->play();
 				return true;
 			}
 		}else if(config->isMappedTo("left", input))
@@ -125,6 +91,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			{
 				onFocusLost();
 				ViewController::get()->goToPrevGameList();
+				Sound::getFromTheme(getTheme(), getName(), "switch")->play();
 				return true;
 			}
 		}else if (config->isMappedTo("x", input))
@@ -132,6 +99,7 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 			// go to random system game
 			setCursor(mRoot->getSystem()->getRandomGame());
 			//ViewController::get()->goToRandomGame();
+			Sound::getFromTheme(getTheme(), getName(), "random")->play();
 			return true;
 		}else if (config->isMappedTo("y", input))
 		{
@@ -148,12 +116,25 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 	return IGameListView::input(config, input);
 }
 
-
-
-
-
-
-
-
-
-
+void ISimpleGameListView::remove(FileData *game)
+{
+	boost::filesystem::remove(game->getPath());  // actually delete the file on the filesystem
+	if (getCursor() == game)                     // Select next element in list, or prev if none
+	{
+		std::vector<FileData*> siblings = game->getParent()->getChildren();
+		auto gameIter = std::find(siblings.begin(), siblings.end(), game);
+		auto gamePos = std::distance(siblings.begin(), gameIter);
+		if (gameIter != siblings.end())
+		{
+			if ((gamePos + 1) < siblings.size())
+			{
+				setCursor(siblings.at(gamePos + 1));
+			}
+			else if ((gamePos - 1) > 0) {
+				setCursor(siblings.at(gamePos - 1));
+			}
+		}
+	}
+	delete game;                                 // remove before repopulating (removes from parent)
+	onFileChanged(game, FILE_REMOVED);           // update the view, with game removed
+}

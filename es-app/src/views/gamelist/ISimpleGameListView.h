@@ -5,6 +5,9 @@
 #include "components/TextComponent.h"
 #include "components/ImageComponent.h"
 
+// TODO: why do we need two stacked interfaces???
+// There is only a single implementation of IGameListView, which is this
+//
 class ISimpleGameListView : public IGameListView
 {
 public:
@@ -15,7 +18,7 @@ public:
 	// NOTE: FILE_SORTED is only reported for the topmost FileData, where the sort started.
 	//       Since sorts are recursive, that FileData's children probably changed too.
 	virtual void onFileChanged(FileData* file, FileChangeType change);
-	
+
 	// Called whenever the theme changes.
 	virtual void onThemeChanged(const std::shared_ptr<ThemeData>& theme);
 
@@ -27,6 +30,7 @@ public:
 
 protected:
 	virtual void populateList(const std::vector<FileData*>& files) = 0;
+	virtual void remove(FileData* game) override;
 
 	TextComponent mHeaderText;
 	ImageComponent mHeaderImage;

@@ -125,6 +125,24 @@ void ImageComponent::setImage(const std::shared_ptr<TextureResource>& texture)
 	resize();
 }
 
+void ImageComponent::setValue(const std::string& value)
+{
+	setImage(value, false);
+}
+
+std::string ImageComponent::getValue() const
+{
+	std::string hasimage = "false";
+	if (hasImage())
+		hasimage = "true";
+	return hasimage;
+}
+
+bool ImageComponent::hasImage() const
+{
+	return (bool)mTexture;
+}
+
 void ImageComponent::setOrigin(float originX, float originY)
 {
 	mOrigin << originX, originY;
@@ -317,11 +335,6 @@ void ImageComponent::fadeIn(bool textureLoaded)
 			updateColors();
 		}
 	}
-}
-
-bool ImageComponent::hasImage()
-{
-	return (bool)mTexture;
 }
 
 void ImageComponent::applyTheme(const std::shared_ptr<ThemeData>& theme, const std::string& view, const std::string& element, unsigned int properties)

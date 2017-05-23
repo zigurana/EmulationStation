@@ -55,7 +55,8 @@ public:
 		AUTOMATIC,
 		BASIC,
 		DETAILED,
-		VIDEO
+		VIDEO,
+		UNIVERSAL
 		// GRID TODO!
 	};
 

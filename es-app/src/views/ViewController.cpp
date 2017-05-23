@@ -5,6 +5,7 @@
 
 #include "views/gamelist/BasicGameListView.h"
 #include "views/gamelist/DetailedGameListView.h"
+#include "views/gamelist/GameListView.h"
 #include "views/gamelist/VideoGameListView.h"
 #include "views/gamelist/GridGameListView.h"
 #include "guis/GuiMenu.h"
@@ -280,17 +281,19 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 	std::shared_ptr<IGameListView> view;
 
 	bool themeHasVideoView = system->getTheme()->hasView("video");
-
+	
 	//decide type
-	GameListViewType selectedViewType = AUTOMATIC;
+	GameListViewType selectedViewType = UNIVERSAL;
 
 	std::string viewPreference = Settings::getInstance()->getString("GamelistViewStyle");
-	if (viewPreference.compare("basic") == 0)
+	if (viewPreference.compare("basic_legacy") == 0)
 		selectedViewType = BASIC;
-	if (viewPreference.compare("detailed") == 0)
+	if (viewPreference.compare("detailed_legacy") == 0)
 		selectedViewType = DETAILED;
-	if (viewPreference.compare("video") == 0)
+	if (viewPreference.compare("video_legacy") == 0)
 		selectedViewType = VIDEO;
+	if (viewPreference.compare("automatic_legacy") == 0)
+		selectedViewType = AUTOMATIC;
 
 	if (selectedViewType == AUTOMATIC)
 	{
@@ -311,6 +314,7 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 	}
 
 	// Create the view
+	
 	switch (selectedViewType)
 	{
 		case VIDEO:
@@ -322,12 +326,16 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 		// case GRID placeholder for future implementation.
 		//		view = std::shared_ptr<IGameListView>(new GridGameListView(mWindow, system->getRootFolder()));
 		//		break;
+		case UNIVERSAL:
+			view = std::shared_ptr<IGameListView>(new GameListView(mWindow, system->getRootFolder(),
+												Settings::getInstance()->getString("GamelistViewStyle"), system->getTheme()));
+			break;
 		case BASIC:
 		default:
 			view = std::shared_ptr<IGameListView>(new BasicGameListView(mWindow, system->getRootFolder()));
 			break;
 	}
-
+	
 	view->setTheme(system->getTheme());
 
 	std::vector<SystemData*>& sysVec = SystemData::sSystemVector;

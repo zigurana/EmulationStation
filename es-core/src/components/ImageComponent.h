@@ -17,6 +17,11 @@ public:
 
 	//Loads the image at the given filepath. Will tile if tile is true (retrieves texture as tiling, creates vertices accordingly).
 	void setImage(std::string path, bool tile = false);
+	void setValue(const std::string& value) override;
+	std::string getValue() const override;  // NB: only returns strings "true" or "false" if an image is set or not.
+	bool hasImage() const;
+
+
 	//Loads an image from memory.
 	void setImage(const char* image, size_t length, bool tile = false);
 	//Use an already existing texture.
@@ -54,7 +59,7 @@ public:
 	// Returns the center point of the image (takes origin into account).
 	Eigen::Vector2f getCenter() const;
 
-	bool hasImage();
+
 
 	void render(const Eigen::Affine3f& parentTrans) override;
 
@@ -86,10 +91,10 @@ private:
 	unsigned int mColorShift;
 
 	std::shared_ptr<TextureResource> mTexture;
-	unsigned char			 mFadeOpacity;
-	bool					 mFading;
-	bool				     mForceLoad;
-	bool					mDynamic;
+	unsigned char					 mFadeOpacity;
+	bool							 mFading;
+	bool							 mForceLoad;
+	bool							 mDynamic;
 };
 
 #endif

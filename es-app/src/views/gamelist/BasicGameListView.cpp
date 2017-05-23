@@ -8,35 +8,37 @@
 #include "FileFilterIndex.h"
 
 BasicGameListView::BasicGameListView(Window* window, FileData* root)
-	: ISimpleGameListView(window, root), mList(window)
+	: ISimpleGameListView(window, root), 
+	mHeaderText(window), mHeaderImage(window), mBackground(window), mList(window)
 {
-	mList.setSize(mSize.x(), mSize.y() * 0.8f);
-	mList.setPosition(0, mSize.y() * 0.2f);
-	mList.setDefaultZIndex(20);
-	addChild(&mList);
-
+	setDefaultHeaderText();
+	setDefaultBackground();
+	setDefaultHeaderImage();
+	setDefaultList();
 	populateList(root->getChildrenListToDisplay());
 }
 
 void BasicGameListView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
 {
-	ISimpleGameListView::onThemeChanged(theme);
 	using namespace ThemeFlags;
-	mList.applyTheme(theme, getName(), "gamelist", ALL);
+	mBackground.applyTheme(theme, getName(), "background", ALL);
+	mList.applyTheme(theme, getName(), "gamelist", ThemeFlags::ALL);
+	mHeaderImage.applyTheme(theme, getName(), "logo", ALL);
+	mHeaderText.applyTheme(theme, getName(), "logoText", ALL);
 
-	sortChildren();
-}
-
-void BasicGameListView::onFileChanged(FileData* file, FileChangeType change)
-{
-	if(change == FILE_METADATA_CHANGED)
+	if (mHeaderImage.hasImage())
 	{
-		// might switch to a detailed view
-		ViewController::get()->reloadGameListView(this);
-		return;
+		removeChild(&mHeaderText);
+		addChild(&mHeaderImage);
+	}
+	else {
+		addChild(&mHeaderText);
+		removeChild(&mHeaderImage);
 	}
 
-	ISimpleGameListView::onFileChanged(file, change);
+	refreshExtras(theme);
+
+	sortChildren();
 }
 
 void BasicGameListView::populateList(const std::vector<FileData*>& files)
@@ -146,4 +148,55 @@ std::vector<HelpPrompt> BasicGameListView::getHelpPrompts()
 	if(Settings::getInstance()->getString("CollectionSystemsAuto").find("favorites") != std::string::npos && mRoot->getSystem()->isGameSystem())
 		prompts.push_back(HelpPrompt("y", "favorite"));
 	return prompts;
+}
+
+void BasicGameListView::setDefaultHeaderText()
+{
+	mHeaderText.setText("Logo Text");
+	mHeaderText.setSize(mSize.x(), 0);
+	mHeaderText.setPosition(0, 0);
+	mHeaderText.setAlignment(ALIGN_CENTER);
+	mHeaderText.setDefaultZIndex(50);
+	addChild(&mHeaderText);
+}
+
+void BasicGameListView::setDefaultBackground()
+{
+	mBackground.setResize(mSize.x(), mSize.y());
+	mBackground.setDefaultZIndex(0);
+	addChild(&mBackground);
+}
+
+void BasicGameListView::setDefaultHeaderImage()
+{
+	mHeaderImage.setResize(0, mSize.y() * 0.185f);
+	mHeaderImage.setOrigin(0.5f, 0.0f);
+	mHeaderImage.setPosition(mSize.x() / 2, 0);
+	mHeaderImage.setDefaultZIndex(50);
+}
+
+void BasicGameListView::setDefaultList()
+{
+	mList.setSize(mSize.x(), mSize.y() * 0.8f);
+	mList.setPosition(0, mSize.y() * 0.2f);
+	mList.setDefaultZIndex(20);
+	addChild(&mList);
+}
+
+void BasicGameListView::refreshExtras(const std::shared_ptr<ThemeData>& theme)
+{
+	// Remove old theme extras
+	for (auto extra : mThemeExtras)
+	{
+		removeChild(extra);
+		delete extra;
+	}
+	mThemeExtras.clear();
+
+	// Add new theme extras
+	mThemeExtras = ThemeData::makeExtras(theme, getName(), mWindow);
+	for (auto extra : mThemeExtras)
+	{
+		addChild(extra);
+	}
 }

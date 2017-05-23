@@ -11,7 +11,7 @@ class ThemeData;
 //  * (0, 0)                     - will automatically calculate a size that fits the text on one line (expand horizontally)
 //  * (x != 0, 0)                - wrap text so that it does not reach beyond x. Will automatically calculate a vertical size (expand vertically).
 //  * (x != 0, y <= fontHeight)  - will truncate text so it fits within this box.
-class TextComponent : public GuiComponent
+class TextComponent : virtual public GuiComponent
 {
 public:
 	TextComponent(Window* window);

@@ -9,8 +9,21 @@
 #include <boost/assign.hpp>
 #include <boost/xpressive/xpressive.hpp>
 
+#include "../es-app/src/FileData.h"
+
+#include "components/DateTimeComponent.h"
 #include "components/ImageComponent.h"
+#include "components/NinePatchComponent.h"
+#include "../es-app/src/components/RatingComponent.h"
+#include "components/ScrollableContainer.h"
+#include "components/ScrollableTextComponent.h"
 #include "components/TextComponent.h"
+#include "../es-app/src/components/TextListComponent.h"
+#include "components/VideoComponent.h"
+#ifdef _RPI_
+#include "components/VideoPlayerComponent.h"
+#endif
+#include "components/VideoVlcComponent.h"
 
 
 // This is a work around for some ambiguity that is introduced in C++11 that boost::assign::map_list_of leave open.
@@ -24,7 +37,7 @@ ElementMapType makeMap(const T& mapInit)
 	return m;
 }
 
-std::vector<std::string> ThemeData::sSupportedViews = boost::assign::list_of("system")("basic")("detailed")("video");
+//std::vector<std::string> ThemeData::sSupportedViews = boost::assign::list_of("system")("basic")("detailed")("video");
 std::vector<std::string> ThemeData::sSupportedFeatures = boost::assign::list_of("video")("carousel")("z-index");
 
 std::map< std::string, ElementMapType > ThemeData::sElementMap = boost::assign::map_list_of
@@ -332,11 +345,11 @@ void ThemeData::parseViews(const pugi::xml_node& root)
 			prevOff = nameAttr.find_first_not_of(delim, off);
 			off = nameAttr.find_first_of(delim, prevOff);
 			
-			if (std::find(sSupportedViews.begin(), sSupportedViews.end(), viewKey) != sSupportedViews.end())
-			{
+			//if (std::find(sSupportedViews.begin(), sSupportedViews.end(), viewKey) != sSupportedViews.end())
+			//{
 				ThemeView& view = mViews.insert(std::pair<std::string, ThemeView>(viewKey, ThemeView())).first->second;
 				parseView(node, view);
-			}
+			//}
 		}
 	}
 }
@@ -530,6 +543,97 @@ std::vector<GuiComponent*> ThemeData::makeExtras(const std::shared_ptr<ThemeData
 	return comps;
 }
 
+std::map<std::string,GuiComponent*> ThemeData::makeThemeComponents(const std::shared_ptr<ThemeData>& theme, const std::string& view, Window* window)
+{
+	LOG(LogDebug) << "ThemeData::makeThemeComponents( view = " << view << " )";
+
+	std::map<std::string,GuiComponent*> comps;
+
+	auto viewIt = theme->mViews.find(view);
+	if (viewIt == theme->mViews.end())
+		return comps;
+
+	for (auto it = viewIt->second.orderedKeys.begin(); it != viewIt->second.orderedKeys.end(); it++)
+	{
+		ThemeElement& elem = viewIt->second.elements.at(*it);
+		GuiComponent* comp = NULL;
+		const std::string& t = elem.type;
+		std::shared_ptr<Font> defaultFont = Font::get(FONT_SIZE_SMALL);
+		
+		if (t == "container")
+		{
+			comp = new ScrollableContainer(window);
+			comp->setDefaultZIndex(10);
+		}
+		else if (t == "datetime")
+		{
+			comp = new DateTimeComponent(window, DateTimeComponent::DISP_RELATIVE_TO_NOW);
+			// TODO: reconsider, this is probably wrong (i.e. for date of release and such)
+			comp->setDefaultZIndex(40);
+		}
+		else if (t == "image")
+		{
+			comp = new ImageComponent(window);
+			comp->setDefaultZIndex(30);
+		}
+		else if (t == "ninepatch")
+		{
+			comp = new NinePatchComponent(window);
+			comp->setDefaultZIndex(35);
+		}
+		else if (t == "rating")
+		{
+			comp = new RatingComponent(window);
+			comp->setSize(defaultFont->getHeight() * 5.0f, (float)defaultFont->getHeight());
+			comp->setDefaultZIndex(40);
+		}
+		else if (t == "text")
+		{
+			if (*it == "md_description")
+			{
+				comp = new ScrollableTextComponent(window);
+			}
+			else
+			{
+				comp = new TextComponent(window);
+			}
+			comp->setDefaultZIndex(50.0);
+		}
+		else if (t == "textlist")
+		{
+			comp = new TextListComponent<FileData*>(window);
+			comp->setDefaultZIndex(50);
+		}
+		else if (t == "video")
+		{
+			// TODO: in videoGameListView, mVideo is derived to be a specific implementation of the abstract base class VideoComponent,
+			// either the VLC based or the OMX based variant. We would like to have a generic constructor for the suitable type, and not
+			// care about this at all. Untill then, we have this (and the ugly inclusions at top):
+#ifdef _RPI_
+			if (Settings::getInstance()->getBool("VideoOmxPlayer"))
+				comp = new VideoPlayerComponent(window, std::string(""));
+			else
+				comp = new VideoVlcComponent(window, std::string(""));
+#else
+			comp = new VideoVlcComponent(window, std::string(""));
+#endif
+			comp->setDefaultZIndex(30);
+		}
+		else
+		{
+			// not a supported GuiComponent type: Carousel (TODO)
+			LOG(LogDebug) << "    Theme element of type '" << t << "' is not recognized (yet), skipping.";
+		}
+
+		if (comp)
+		{
+			comps.insert(std::pair < std::string, GuiComponent* >(*it, comp));
+		}
+	}
+
+	return comps;
+}
+
 std::map<std::string, ThemeSet> ThemeData::getThemeSets()
 {
 	std::map<std::string, ThemeSet> sets;
@@ -578,4 +682,14 @@ fs::path ThemeData::getThemeFromCurrentSet(const std::string& system)
 	}
 
 	return set->second.getThemePath(system);
+}
+
+std::vector<std::string> ThemeData::getViewNames()
+{
+	std::vector<std::string> list;
+	for (auto it = mViews.begin(); it != mViews.end(); it++)
+	{
+		list.push_back(it->first);
+	}
+	return list;
 }

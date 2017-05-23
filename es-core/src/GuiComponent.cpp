@@ -165,7 +165,7 @@ void GuiComponent::clearChildren()
 
 void GuiComponent::sortChildren()
 {
-	std:stable_sort(mChildren.begin(), mChildren.end(),  [](GuiComponent* a, GuiComponent* b) {
+	std::stable_sort(mChildren.begin(), mChildren.end(),  [](GuiComponent* a, GuiComponent* b) {
 		return b->getZIndex() > a->getZIndex();
 	});
 }
@@ -335,7 +335,7 @@ void GuiComponent::applyTheme(const std::shared_ptr<ThemeData>& theme, const std
 	Eigen::Vector2f scale = getParent() ? getParent()->getSize() : Eigen::Vector2f((float)Renderer::getScreenWidth(), (float)Renderer::getScreenHeight());
 
 	const ThemeData::ThemeElement* elem = theme->getElement(view, element, "");
-	if(!elem)
+	if (!elem)
 		return;
 
 	using namespace ThemeFlags;

@@ -2,7 +2,7 @@
 
 #include "GuiComponent.h"
 
-class ScrollableContainer : public GuiComponent
+class ScrollableContainer : virtual public GuiComponent
 {
 public:
 	ScrollableContainer(Window* window);

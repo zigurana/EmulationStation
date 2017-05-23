@@ -33,6 +33,8 @@ public:
 
 	// Loads the video at the given filepath
 	bool setVideo(std::string path);
+	void setValue(const std::string& value) override;
+
 	// Loads a static image that is displayed if the video cannot be played
 	void setImage(std::string path);
 

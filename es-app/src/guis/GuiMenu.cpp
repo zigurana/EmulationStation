@@ -216,14 +216,20 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 				});
 			}
 
-			// GameList view style
+			// GameList view-styles
+
 			auto gamelist_style = std::make_shared< OptionListComponent<std::string> >(mWindow, "GAMELIST VIEW STYLE", false);
-			std::vector<std::string> styles;
-			styles.push_back("automatic");
-			styles.push_back("basic");
-			styles.push_back("detailed");
-			styles.push_back("video");
-			for (auto it = styles.begin(); it != styles.end(); it++)
+			std::vector<std::string> views = ViewController::get()->getState().getSystem()->getTheme()->getViewNames();
+			views.push_back("automatic_legacy");
+			views.push_back("basic_legacy");
+			views.push_back("detailed_legacy");
+			views.push_back("video_legacy");
+
+			// remove unsupported (but present) view types
+			views.erase(std::remove(views.begin(), views.end(), "system"), views.end());
+			views.erase(std::remove(views.begin(), views.end(), "grid"), views.end());
+
+			for (auto it = views.begin(); it != views.end(); it++)
 				gamelist_style->add(*it, *it, Settings::getInstance()->getString("GamelistViewStyle") == *it);
 			s->addWithLabel("GAMELIST VIEW STYLE", gamelist_style);
 			s->addSaveFunc([gamelist_style] {

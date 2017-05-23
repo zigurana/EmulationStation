@@ -17,7 +17,7 @@ public:
 
 	virtual bool input(InputConfig* config, Input input) override;
 
-	virtual const char* getName() const override { return "grid"; }
+	virtual const std::string getName() const override { return "grid"; }
 
 	virtual std::vector<HelpPrompt> getHelpPrompts() override;
 	virtual void launch(FileData* game) override;
