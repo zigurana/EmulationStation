@@ -138,7 +138,8 @@ public:
 	static std::map<std::string, ThemeSet> getThemeSets();
 	static boost::filesystem::path getThemeFromCurrentSet(const std::string& system);
 	
-	std::vector<std::string> getViewNames();
+	std::vector<std::string> getGameListViewNames();
+
 
 private:
 	static std::map< std::string, std::map<std::string, ElementPropertyType> > sElementMap;
@@ -156,4 +157,5 @@ private:
 	void parseElement(const pugi::xml_node& elementNode, const std::map<std::string, ElementPropertyType>& typeMap, ThemeElement& element);
 
 	std::map<std::string, ThemeView> mViews;
+	std::vector<std::string> getViewNames();
 };

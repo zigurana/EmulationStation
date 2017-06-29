@@ -9,7 +9,6 @@ ScrollableTextComponent::ScrollableTextComponent(Window* window) : GuiComponent(
 
 void ScrollableTextComponent::render(const Eigen::Affine3f& parentTrans)
 {
-	//mText.render(parentTrans);
 	mContainer.render(parentTrans);
 }
 

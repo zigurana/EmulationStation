@@ -286,13 +286,13 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 	GameListViewType selectedViewType = UNIVERSAL;
 
 	std::string viewPreference = Settings::getInstance()->getString("GamelistViewStyle");
-	if (viewPreference.compare("basic_legacy") == 0)
+	if (viewPreference == "basic_legacy")
 		selectedViewType = BASIC;
-	if (viewPreference.compare("detailed_legacy") == 0)
+	if (viewPreference == "detailed_legacy")
 		selectedViewType = DETAILED;
-	if (viewPreference.compare("video_legacy") == 0)
+	if (viewPreference == "video_legacy")
 		selectedViewType = VIDEO;
-	if (viewPreference.compare("automatic_legacy") == 0)
+	if (viewPreference == "automatic_legacy")
 		selectedViewType = AUTOMATIC;
 
 	if (selectedViewType == AUTOMATIC)
@@ -314,7 +314,6 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 	}
 
 	// Create the view
-	
 	switch (selectedViewType)
 	{
 		case VIDEO:
@@ -328,7 +327,7 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 		//		break;
 		case UNIVERSAL:
 			view = std::shared_ptr<IGameListView>(new GameListView(mWindow, system->getRootFolder(),
-												Settings::getInstance()->getString("GamelistViewStyle"), system->getTheme()));
+				Settings::getInstance()->getString("GamelistViewStyle"), system->getTheme()));
 			break;
 		case BASIC:
 		default:

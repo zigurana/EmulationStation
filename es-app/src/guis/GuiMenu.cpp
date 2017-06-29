@@ -205,40 +205,38 @@ GuiMenu::GuiMenu(Window* window) : GuiComponent(window), mMenu(window, "MAIN MEN
 				Window* window = mWindow;
 				s->addSaveFunc([window, theme_set]
 				{
-					bool needReload = false;
-					if(Settings::getInstance()->getString("ThemeSet") != theme_set->getSelected())
-						needReload = true;
-
-					Settings::getInstance()->setString("ThemeSet", theme_set->getSelected());
-
-					if(needReload)
+					if (Settings::getInstance()->getString("ThemeSet") != theme_set->getSelected())
+					{
+						Settings::getInstance()->setString("ThemeSet", theme_set->getSelected());
 						ViewController::get()->reloadAll(); // TODO - replace this with some sort of signal-based implementation
+					}
 				});
 			}
 
-			// GameList view-styles
-
+			std::vector<std::string> views = getAvailableViewStyles();
 			auto gamelist_style = std::make_shared< OptionListComponent<std::string> >(mWindow, "GAMELIST VIEW STYLE", false);
-			std::vector<std::string> views = ViewController::get()->getState().getSystem()->getTheme()->getViewNames();
-			views.push_back("automatic_legacy");
-			views.push_back("basic_legacy");
-			views.push_back("detailed_legacy");
-			views.push_back("video_legacy");
-
-			// remove unsupported (but present) view types
-			views.erase(std::remove(views.begin(), views.end(), "system"), views.end());
-			views.erase(std::remove(views.begin(), views.end(), "grid"), views.end());
-
 			for (auto it = views.begin(); it != views.end(); it++)
 				gamelist_style->add(*it, *it, Settings::getInstance()->getString("GamelistViewStyle") == *it);
 			s->addWithLabel("GAMELIST VIEW STYLE", gamelist_style);
-			s->addSaveFunc([gamelist_style] {
-				bool needReload = false;
+			
+			s->addSaveFunc([gamelist_style, this] {
+				// When changed: store and reload.
 				if (Settings::getInstance()->getString("GamelistViewStyle") != gamelist_style->getSelected())
-					needReload = true;
-				Settings::getInstance()->setString("GamelistViewStyle", gamelist_style->getSelected());
-				if (needReload)
+				{
+					Settings::getInstance()->setString("GamelistViewStyle", gamelist_style->getSelected());
 					ViewController::get()->reloadAll();
+				}
+				// Always: check if the stored style is valid, otherwise replace with first one in the list
+				std::string storedViewStyle = Settings::getInstance()->getString("GamelistViewStyle");
+
+				// get fresh list of views
+				std::vector<std::string> views = getAvailableViewStyles();
+
+				if (std::find(views.begin(), views.end(), storedViewStyle) == views.end())
+				{
+					// Stored Gamelist View type is not present in current theme, revert to first legal GLV type in list.
+					Settings::getInstance()->setString("GamelistViewStyle", views.at(0));
+				}
 			});
 
 			// show help
@@ -444,4 +442,14 @@ std::vector<HelpPrompt> GuiMenu::getHelpPrompts()
 	prompts.push_back(HelpPrompt("a", "select"));
 	prompts.push_back(HelpPrompt("start", "close"));
 	return prompts;
+}
+
+std::vector<std::string> GuiMenu::getAvailableViewStyles()
+{
+	std::vector<std::string> views = ViewController::get()->getState().getSystem()->getTheme()->getGameListViewNames();
+	views.push_back("automatic_legacy");
+	views.push_back("basic_legacy");
+	views.push_back("detailed_legacy");
+	views.push_back("video_legacy");
+	return views;
 }

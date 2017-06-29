@@ -23,7 +23,7 @@ Eigen::Vector2f ImageComponent::getCenter() const
 
 ImageComponent::ImageComponent(Window* window, bool forceLoad, bool dynamic) : GuiComponent(window),
 	mTargetIsMax(false), mFlipX(false), mFlipY(false), mOrigin(0.0, 0.0), mTargetSize(0, 0), mColorShift(0xFFFFFFFF),
-	mForceLoad(forceLoad), mDynamic(dynamic), mFadeOpacity(0.0f), mFading(false)
+	mForceLoad(forceLoad), mDynamic(dynamic), mFadeOpacity(0.0f), mFading(false), mVisible(true)
 {
 	updateColors();
 }
@@ -125,24 +125,6 @@ void ImageComponent::setImage(const std::shared_ptr<TextureResource>& texture)
 	resize();
 }
 
-void ImageComponent::setValue(const std::string& value)
-{
-	setImage(value, false);
-}
-
-std::string ImageComponent::getValue() const
-{
-	std::string hasimage = "false";
-	if (hasImage())
-		hasimage = "true";
-	return hasimage;
-}
-
-bool ImageComponent::hasImage() const
-{
-	return (bool)mTexture;
-}
-
 void ImageComponent::setOrigin(float originX, float originY)
 {
 	mOrigin << originX, originY;
@@ -189,6 +171,24 @@ void ImageComponent::setOpacity(unsigned char opacity)
 	mOpacity = opacity;
 	mColorShift = (mColorShift >> 8 << 8) | mOpacity;
 	updateColors();
+}
+
+void ImageComponent::setValue(const std::string& value)
+{
+	if (value == "true")
+		mVisible = true;
+	else if (value == "false")
+		mVisible = false;
+	else
+		setImage(value, false);
+}
+
+std::string ImageComponent::getValue() const
+{
+	if (hasImage())
+		return "true";
+	else
+		return "false";
 }
 
 void ImageComponent::updateVertices()
@@ -257,7 +257,7 @@ void ImageComponent::render(const Eigen::Affine3f& parentTrans)
 	Eigen::Affine3f trans = roundMatrix(parentTrans * getTransform());
 	Renderer::setMatrix(trans);
 	
-	if(mTexture && mOpacity > 0)
+	if(mTexture && mOpacity > 0 && mVisible)
 	{
 		if(mTexture->isInitialized())
 		{
@@ -335,6 +335,11 @@ void ImageComponent::fadeIn(bool textureLoaded)
 			updateColors();
 		}
 	}
+}
+
+bool ImageComponent::hasImage() const
+{
+	return (bool)mTexture;
 }
 
 void ImageComponent::applyTheme(const std::shared_ptr<ThemeData>& theme, const std::string& view, const std::string& element, unsigned int properties)

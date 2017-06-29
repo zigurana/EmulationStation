@@ -20,11 +20,14 @@ MetaDataDecl gameDecls[] = {
 	{"genre",       MD_STRING,              "unknown",          false,      "genre",                "enter game genre"},
 	{"players",     MD_INT,                 "1",                false,      "players",              "enter number of players"},
 	{"favorite",    MD_BOOL,                "false",            false,      "favorite",             "enter favorite off/on"},
+	{"kidgame",     MD_BOOL,                "false",            false,      "kidgame",              "toggle kidgame status" },
+	{"hidden",      MD_BOOL,                "false",            false,      "hidden",               "toggle hidden status" },
 	{"playcount",   MD_INT,                 "0",                true,       "play count",           "enter number of times played"},
 	{"lastplayed",  MD_TIME,                "0",                true,       "last played",          "enter last played date"}
 };
 const std::vector<MetaDataDecl> gameMDD(gameDecls, gameDecls + sizeof(gameDecls) / sizeof(gameDecls[0]));
 
+// TODO: this can be removed?
 MetaDataDecl folderDecls[] = {
 	{"name",        MD_STRING,              "",                 false,      "name",                 "enter game name"},
 	{"desc",        MD_MULTILINE_STRING,    "",                 false,      "description",          "enter description"},
@@ -43,16 +46,16 @@ const std::vector<MetaDataDecl> folderMDD(folderDecls, folderDecls + sizeof(fold
 
 const std::vector<MetaDataDecl>& getMDDByType(MetaDataListType type)
 {
-	switch(type)
-	{
-	case GAME_METADATA:
+	//switch(type)
+	//{
+	//case GAME_METADATA:
 		return gameMDD;
-	case FOLDER_METADATA:
-		return folderMDD;
-	}
+	//case FOLDER_METADATA:
+	//	return folderMDD;
+	//}
 
-	LOG(LogError) << "Invalid MDD type";
-	return gameMDD;
+	//LOG(LogError) << "Invalid MDD type";
+	//return gameMDD;
 }
 
 

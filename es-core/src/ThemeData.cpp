@@ -693,3 +693,11 @@ std::vector<std::string> ThemeData::getViewNames()
 	}
 	return list;
 }
+
+std::vector<std::string> ThemeData::getGameListViewNames()
+{
+	std::vector<std::string> list = getViewNames();
+	list.erase(std::remove(list.begin(), list.end(), "system"), list.end());
+	list.erase(std::remove(list.begin(), list.end(), "grid"), list.end());
+	return list;
+}

@@ -274,11 +274,6 @@ void GameListView::setComponentLegacyProperties()
 			comp.second->setDefaultZIndex(50);
 		}
 
-		// For now remove unsupported MetaData types from collection.
-		mThemeComponents.erase("md_hidden");
-		mThemeComponents.erase("md_favorite");
-		mThemeComponents.erase("md_kidgame");
-		/*
 		if (comp.first == "md_hidden")
 		{
 		metaDataLabel = "hidden";
@@ -294,7 +289,6 @@ void GameListView::setComponentLegacyProperties()
 		metaDataLabel = "kidgame";
 		comp.second->setDefaultZIndex(50);
 		}
-		*/
 
 		// if item is identified based on the element name, add to list
 		if (metaDataLabel != "")
