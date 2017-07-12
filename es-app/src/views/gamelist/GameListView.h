@@ -21,12 +21,15 @@ public:
 	virtual std::vector<HelpPrompt> getHelpPrompts() override;
 
 protected:
+	// mList maintenance methods
 	virtual void populateList(const std::vector<FileData*>& files) override;
-	
+	virtual void remove(FileData* game, bool deleteFile) override;
+	virtual void addPlaceholder();
+
 	virtual void launch(FileData* game) override;
 
-//	virtual void remove(FileData* game) override;
-
+	
+	// Theme rendering methods
 	void applyThemes(const std::shared_ptr<ThemeData>& theme); // Apply the specified theme to all mThemeComponents.
 	void setDefaultList();					// Sets the default for the only required GuiComponent for any view.
 	void setComponentLegacyProperties();	// Set the properties of legacy theme element components (called once upon loading theme)

@@ -30,7 +30,6 @@ public:
 
 protected:
 	virtual void populateList(const std::vector<FileData*>& files) = 0;
-	virtual void remove(FileData* game) override;
 
 	TextComponent mHeaderText;
 	ImageComponent mHeaderImage;

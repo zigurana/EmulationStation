@@ -34,9 +34,45 @@ void GameListView::populateList(const std::vector<FileData*>& files)
 	else
 	{
 		// empty list - add a placeholder
-		FileData* placeholder = new FileData(PLACEHOLDER, "<No Results Found for Current Filter Criteria>", this->mRoot->getSystem());
-		mList.add(placeholder->getName(), placeholder, (placeholder->getType() == PLACEHOLDER));
+		addPlaceholder();
 	}
+}
+
+void GameListView::remove(FileData *game, bool deleteFile)
+{
+	if (deleteFile)
+		boost::filesystem::remove(game->getPath());  // actually delete the file on the filesystem
+	FileData* parent = game->getParent();
+	if (getCursor() == game)                     // Select next element in list, or prev if none
+	{
+		std::vector<FileData*> siblings = parent->getChildrenListToDisplay();
+		auto gameIter = std::find(siblings.begin(), siblings.end(), game);
+		auto gamePos = std::distance(siblings.begin(), gameIter);
+		if (gameIter != siblings.end())
+		{
+			if ((gamePos + 1) < siblings.size())
+			{
+				setCursor(siblings.at(gamePos + 1));
+			}
+			else if ((gamePos - 1) > 0) {
+				setCursor(siblings.at(gamePos - 1));
+			}
+		}
+	}
+	mList.remove(game);
+	if (mList.size() == 0)
+	{
+		addPlaceholder();
+	}
+	delete game;                                 // remove before repopulating (removes from parent)
+	onFileChanged(parent, FILE_REMOVED);           // update the view, with game removed
+}
+
+void GameListView::addPlaceholder()
+{
+	// empty list - add a placeholder
+	FileData* placeholder = new FileData(PLACEHOLDER, "<No Entries Found>", this->mRoot->getSystem()->getSystemEnvData(), this->mRoot->getSystem());
+	mList.add(placeholder->getName(), placeholder, (placeholder->getType() == PLACEHOLDER));
 }
 
 void GameListView::onThemeChanged(const std::shared_ptr<ThemeData>& theme)
