@@ -56,6 +56,7 @@ public:
 	void removeChild(FileData* file); //Error if mType != FOLDER
 
 	inline bool isPlaceHolder() { return mType == PLACEHOLDER; };
+	bool isGameFile();
 
 	virtual inline void refreshMetadata() { return; };
 
