@@ -228,6 +228,18 @@ void FileData::removeChild(FileData* file)
 
 }
 
+bool FileData::isGameFile()
+{
+	// we exclude non-game files from collections (i.e. "kodi", entries from non-game systems)
+	// if/when there are more in the future, maybe this can be a more complex method, with a proper list
+	// but for now a simple string comparison is more performant
+	// TODO: Consider, do we need to be a Game type or are folders also allowed??
+
+	return (this->getName() != "kodi" &&
+		//file->getType() == GAME &&  // TOD: consider to add this
+		this->getSystem()->isGameSystem());
+}
+
 void FileData::sort(ComparisonFunction& comparator, bool ascending)
 {
 	std::stable_sort(mChildren.begin(), mChildren.end(), comparator);

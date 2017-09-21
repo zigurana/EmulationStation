@@ -8,7 +8,10 @@
 #include "CollectionSystemManager.h"
 #include "Window.h"
 
-GuiCollectionSystemsOptions::GuiCollectionSystemsOptions(Window* window) : GuiComponent(window), mMenu(window, "GAME COLLECTION SETTINGS")
+GuiCollectionSystemsOptions::GuiCollectionSystemsOptions(Window* window) 
+	:
+	GuiComponent(window), 
+	mMenu(window, "GAME COLLECTION SETTINGS")
 {
 	initializeMenu();
 }
@@ -18,15 +21,13 @@ void GuiCollectionSystemsOptions::initializeMenu()
 	addChild(&mMenu);
 
 	// get collections
-
 	addSystemsToMenu();
 
 	// add "Create New Custom Collection from Theme"
-
 	std::vector<std::string> unusedFolders = CollectionSystemManager::get()->getUnusedSystemsFromTheme();
 	if (unusedFolders.size() > 0)
 	{
-		addEntry("CREATE NEW CUSTOM COLLECTION FROM THEME", 0x777777FF, true,
+		addEntry("CREATE NEW FROM THEME", 0x777777FF, true,
 		[this, unusedFolders] {
 			auto s = new GuiSettings(mWindow, "SELECT THEME FOLDER");
 			std::shared_ptr< OptionListComponent<std::string> > folderThemes = std::make_shared< OptionListComponent<std::string> >(mWindow, "SELECT THEME FOLDER", true);
@@ -51,7 +52,7 @@ void GuiCollectionSystemsOptions::initializeMenu()
 	}
 
 	ComponentListRow row;
-	row.addElement(std::make_shared<TextComponent>(mWindow, "CREATE NEW CUSTOM COLLECTION", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
+	row.addElement(std::make_shared<TextComponent>(mWindow, "CREATE NEW", Font::get(FONT_SIZE_MEDIUM), 0x777777FF), true);
 	auto createCustomCollection = [this](const std::string& newVal) {
 		std::string name = newVal;
 		// we need to store the first Gui and remove it, as it'll be deleted by the actual Gui
@@ -68,11 +69,11 @@ void GuiCollectionSystemsOptions::initializeMenu()
 
 	bundleCustomCollections = std::make_shared<SwitchComponent>(mWindow);
 	bundleCustomCollections->setState(Settings::getInstance()->getBool("UseCustomCollectionsSystem"));
-	mMenu.addWithLabel("GROUP UNTHEMED CUSTOM COLLECTIONS", bundleCustomCollections);
+	mMenu.addWithLabel("GROUP UNTHEMED COLLECTIONS", bundleCustomCollections);
 
-	sortAllSystemsSwitch = std::make_shared<SwitchComponent>(mWindow);
-	sortAllSystemsSwitch->setState(Settings::getInstance()->getBool("SortAllSystems"));
-	mMenu.addWithLabel("SORT CUSTOM COLLECTIONS AND SYSTEMS", sortAllSystemsSwitch);
+	sortCollectionsWithSystemsSwitch = std::make_shared<SwitchComponent>(mWindow);
+	sortCollectionsWithSystemsSwitch->setState(Settings::getInstance()->getBool("sortCollectionsWithSystems"));
+	mMenu.addWithLabel("SORT COLLECTIONS WITH SYSTEMS", sortCollectionsWithSystemsSwitch);
 
 	if(CollectionSystemManager::get()->isEditing())
 	{
@@ -109,10 +110,8 @@ void GuiCollectionSystemsOptions::addEntry(const char* name, unsigned int color,
 void GuiCollectionSystemsOptions::createCollection(std::string inName) {
 	std::string name = CollectionSystemManager::get()->getValidNewCollectionName(inName);
 	SystemData* newSys = CollectionSystemManager::get()->addNewCustomCollection(name);
-	customOptionList->add(name, name, true);
-	std::string outAuto = vectorToCommaString(autoOptionList->getSelectedObjects());
-	std::string outCustom = vectorToCommaString(customOptionList->getSelectedObjects());
-	updateSettings(outAuto, outCustom);
+	optionList->add(name, name, true);
+	updateSettings(vectorToCommaString(optionList->getSelectedObjects()));
 	ViewController::get()->goToSystemView(newSys);
 
 	Window* window = mWindow;
@@ -135,53 +134,38 @@ GuiCollectionSystemsOptions::~GuiCollectionSystemsOptions()
 
 void GuiCollectionSystemsOptions::addSystemsToMenu()
 {
+	std::map<std::string, CollectionSystemManager::CollectionSystem*> collectionSystems = CollectionSystemManager::get()->getCollectionSystems();
 
-	std::map<std::string, CollectionSystemData> autoSystems = CollectionSystemManager::get()->getAutoCollectionSystems();
+	optionList = std::make_shared< OptionListComponent<std::string> >(mWindow, "SELECT COLLECTIONS", true);
 
-	autoOptionList = std::make_shared< OptionListComponent<std::string> >(mWindow, "SELECT COLLECTIONS", true);
-
-	// add Auto Systems
-	for(std::map<std::string, CollectionSystemData>::const_iterator it = autoSystems.cbegin() ; it != autoSystems.cend() ; it++ )
+	// add Systems
+	for(const auto col : collectionSystems)
 	{
-		autoOptionList->add(it->second.decl.longName, it->second.decl.name, it->second.isEnabled);
+		optionList->add(col.second->decl.longName, col.second->decl.name, col.second->isEnabled);
 	}
-	mMenu.addWithLabel("AUTOMATIC GAME COLLECTIONS", autoOptionList);
-
-	std::map<std::string, CollectionSystemData> customSystems = CollectionSystemManager::get()->getCustomCollectionSystems();
-
-	customOptionList = std::make_shared< OptionListComponent<std::string> >(mWindow, "SELECT COLLECTIONS", true);
-
-	// add Custom Systems
-	for(std::map<std::string, CollectionSystemData>::const_iterator it = customSystems.cbegin() ; it != customSystems.cend() ; it++ )
-	{
-		customOptionList->add(it->second.decl.longName, it->second.decl.name, it->second.isEnabled);
-	}
-	mMenu.addWithLabel("CUSTOM GAME COLLECTIONS", customOptionList);
+	mMenu.addWithLabel("GAME COLLECTIONS", optionList);
 }
 
 void GuiCollectionSystemsOptions::applySettings()
 {
-	std::string outAuto = vectorToCommaString(autoOptionList->getSelectedObjects());
-	std::string prevAuto = Settings::getInstance()->getString("CollectionSystemsAuto");
-	std::string outCustom = vectorToCommaString(customOptionList->getSelectedObjects());
-	std::string prevCustom = Settings::getInstance()->getString("CollectionSystemsCustom");
-	bool outSort = sortAllSystemsSwitch->getState();
-	bool prevSort = Settings::getInstance()->getBool("SortAllSystems");
-	bool outBundle = bundleCustomCollections->getState();
+	std::string newSelected = vectorToCommaString(optionList->getSelectedObjects());
+	std::string prevSelected = Settings::getInstance()->getString("EnabledCollectionSystems");
+	bool newSort = sortCollectionsWithSystemsSwitch->getState();
+	bool prevSort = Settings::getInstance()->getBool("sortCollectionsWithSystems");
+	bool newBundle = bundleCustomCollections->getState();
 	bool prevBundle = Settings::getInstance()->getBool("UseCustomCollectionsSystem");
-	bool needUpdateSettings = prevAuto != outAuto || prevCustom != outCustom || outSort != prevSort || outBundle != prevBundle;
+	bool needUpdateSettings = newSelected != prevSelected || newSort != prevSort || newBundle != prevBundle;
 	if (needUpdateSettings)
 	{
-		updateSettings(outAuto, outCustom);
+		updateSettings(newSelected);
 	}
 	delete this;
 }
 
-void GuiCollectionSystemsOptions::updateSettings(std::string newAutoSettings, std::string newCustomSettings)
+void GuiCollectionSystemsOptions::updateSettings(std::string newSelectedSystems)
 {
-	Settings::getInstance()->setString("CollectionSystemsAuto", newAutoSettings);
-	Settings::getInstance()->setString("CollectionSystemsCustom", newCustomSettings);
-	Settings::getInstance()->setBool("SortAllSystems", sortAllSystemsSwitch->getState());
+	Settings::getInstance()->setString("EnabledCollectionSystems", newSelectedSystems);
+	Settings::getInstance()->setBool("sortCollectionsWithSystems", sortCollectionsWithSystemsSwitch->getState());
 	Settings::getInstance()->setBool("UseCustomCollectionsSystem", bundleCustomCollections->getState());
 	Settings::getInstance()->saveFile();
 	CollectionSystemManager::get()->loadEnabledListFromSettings();

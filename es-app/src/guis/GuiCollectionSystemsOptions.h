@@ -23,12 +23,11 @@ private:
 	void applySettings();
 	void addSystemsToMenu();
 	void addEntry(const char* name, unsigned int color, bool add_arrow, const std::function<void()>& func);
-	void updateSettings(std::string newAutoSettings, std::string newCustomSettings);
+	void updateSettings(std::string newSelectedSystems);
 	void createCollection(std::string inName);
 	void exitEditMode();
-	std::shared_ptr< OptionListComponent<std::string> > autoOptionList;
-	std::shared_ptr< OptionListComponent<std::string> > customOptionList;
-	std::shared_ptr<SwitchComponent> sortAllSystemsSwitch;
+	std::shared_ptr< OptionListComponent<std::string> > optionList;
+	std::shared_ptr<SwitchComponent> sortCollectionsWithSystemsSwitch;
 	std::shared_ptr<SwitchComponent> bundleCustomCollections;
 	MenuComponent mMenu;
 	SystemData* mSystem;

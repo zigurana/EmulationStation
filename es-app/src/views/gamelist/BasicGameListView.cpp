@@ -141,7 +141,7 @@ std::vector<HelpPrompt> BasicGameListView::getHelpPrompts()
 	prompts.push_back(HelpPrompt("b", "back"));
 	prompts.push_back(HelpPrompt("select", "options"));
 	prompts.push_back(HelpPrompt("x", "random"));
-	if(mRoot->getSystem()->isGameSystem() && !ViewController::get()->isUIModeKid())
+	if(mRoot->getSystem()->isGameSystem() && !ViewController::get()->isUIModeKid() &&	CollectionSystemManager::get()->isEditing())
 	{
 		std::string prompt = CollectionSystemManager::get()->getEditingCollection();
 		prompts.push_back(HelpPrompt("y", prompt));

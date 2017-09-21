@@ -110,9 +110,8 @@ void Settings::setDefaults()
 	mBoolMap["CaptionsCompatibility"] = true;
 	// Audio out device for Video playback using OMX player.
 	mStringMap["OMXAudioDev"] = "both";
-	mStringMap["CollectionSystemsAuto"] = "";
-	mStringMap["CollectionSystemsCustom"] = "";
-	mBoolMap["SortAllSystems"] = false;
+	mStringMap["EnabledCollectionSystems"] = "";
+	mBoolMap["sortCollectionsWithSystems"] = false;
 	mBoolMap["UseCustomCollectionsSystem"] = true;
 
 	// Audio out device for volume control

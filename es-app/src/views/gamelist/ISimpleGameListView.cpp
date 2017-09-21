@@ -146,7 +146,8 @@ bool ISimpleGameListView::input(InputConfig* config, Input input)
 		{
 			if(mRoot->getSystem()->isGameSystem())
 			{
-				if(CollectionSystemManager::get()->toggleGameInCollection(getCursor()))
+				if(CollectionSystemManager::get()->isEditing() &&
+					CollectionSystemManager::get()->toggleGameInCollection(getCursor()))
 				{
 					return true;
 				}

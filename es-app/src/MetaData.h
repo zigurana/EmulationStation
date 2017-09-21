@@ -55,6 +55,7 @@ public:
 	const std::string& get(const std::string& key) const;
 	int getInt(const std::string& key) const;
 	float getFloat(const std::string& key) const;
+	bool getBool(const std::string& key) const;
 	boost::posix_time::ptime getTime(const std::string& key) const;
 
 	bool isDefault();

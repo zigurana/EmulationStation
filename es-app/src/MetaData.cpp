@@ -141,6 +141,11 @@ int MetaDataList::getInt(const std::string& key) const
 	return atoi(get(key).c_str());
 }
 
+bool MetaDataList::getBool(const std::string& key) const
+{
+	return (strToUpper(mMap.at(key)).compare("TRUE") == 0);
+}
+
 float MetaDataList::getFloat(const std::string& key) const
 {
 	return (float)atof(get(key).c_str());
