@@ -82,8 +82,6 @@ GuiGamelistOptions::GuiGamelistOptions(Window* window, SystemData* system) : Gui
 	row.makeAcceptInputHandler(std::bind(&GuiGamelistOptions::openGamelistFilter, this));
 	mMenu.addRow(row);
 
-	std::map<std::string, CollectionSystemData> customCollections = CollectionSystemManager::get()->getCustomCollectionSystems();
-
 	if (ViewController::get()->isUIModeFull())
 	{
 		if (!fromPlaceholder && !(mSystem->isCollection() && file->getType() == FOLDER))
