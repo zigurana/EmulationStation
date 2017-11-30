@@ -144,19 +144,21 @@ void UIModeController::logInput(InputConfig * config, Input input)
 		mapname += mn;
 		mapname += ", ";
 	}
-	LOG(LogDebug) << "UIModeController::logInput( " << config->getDeviceName() <<" ):" << input.string() << ", isMappedTo= " << mapname << ", value=" << input.value;
+	LOG(LogDebug) << "UIModeController::logInput( " << config->getDeviceName() <<" ):" <<
+		input.string() << ", isMappedTo= " << mapname <<", value=" << input.value << ", isValidInput: " <<
+		(isValidInput(config,input)? "yes" : "no");
 }
+
 
 bool UIModeController::isValidInput(InputConfig * config, Input input)
 {
-	if((config->getMappedTo(input).size() == 0)  || // not a mapped input, so ignore.
-		(input.type == TYPE_HAT) ||  // ignore all HAT inputs
-		(!input.value))	// not a key-down event
+	if((config->getMappedTo(input).size() != 0) && // a mapped input, and
+		(input.value != 0))                        // a key-down event
 	{
-		return false;
+		return true;
 	}
 	else
 	{
-		return true;
+		return false;
 	}
 }
